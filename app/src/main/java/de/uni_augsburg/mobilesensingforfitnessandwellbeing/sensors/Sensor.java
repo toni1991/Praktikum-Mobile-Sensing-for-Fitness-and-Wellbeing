@@ -1,12 +1,14 @@
 package de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors;
 
+import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.CallSuper;
 
 public abstract class Sensor {
 
     protected int windowLengthMillis;
 
-    protected Context context;
+    protected Activity activity;
 
     public abstract float getCurrentlyDesiredBpm();
 
@@ -14,8 +16,10 @@ public abstract class Sensor {
 
     public abstract double getRawSensorValue();
 
-    public Sensor(Context context) {
-        this.context = context;
+    public abstract boolean isReady();
+
+    public Sensor(Activity activity) {
+        this.activity = activity;
     }
 
     public void setWindowLengthMillis(int windowLenghtMillis) {
