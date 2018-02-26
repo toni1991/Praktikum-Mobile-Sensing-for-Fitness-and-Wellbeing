@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Mobile Sensing for Fitness and Wellbeing</string>
+    <string name="button_start">Start</string>
+    <string name="button_stop">Stop</string>
 </resources>
