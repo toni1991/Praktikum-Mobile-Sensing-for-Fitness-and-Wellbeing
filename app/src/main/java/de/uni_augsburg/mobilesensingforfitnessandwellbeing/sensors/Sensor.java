@@ -14,12 +14,12 @@ public abstract class Sensor {
 
     public abstract double getRawSensorValue();
 
-    public void setWindowLengthMillis(int windowLenghtMillis){
-        this.windowLengthMillis  = windowLenghtMillis;
+    public Sensor(Context context) {
+        this.context = context;
     }
 
-    public void setContext(Context context){
-        this.context = context;
+    public void setWindowLengthMillis(int windowLenghtMillis) {
+        this.windowLengthMillis  = windowLenghtMillis;
     }
 
 }
