@@ -1,8 +1,12 @@
 package de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors;
 
+import android.content.Context;
+
 public abstract class Sensor {
 
-    private int windowLengthMillis;
+    protected int windowLengthMillis;
+
+    protected Context context;
 
     public abstract float getCurrentlyDesiredBpm();
 
@@ -12,6 +16,10 @@ public abstract class Sensor {
 
     public void setWindowLengthMillis(int windowLenghtMillis){
         this.windowLengthMillis  = windowLenghtMillis;
+    }
+
+    public void setContext(Context context){
+        this.context = context;
     }
 
 }
