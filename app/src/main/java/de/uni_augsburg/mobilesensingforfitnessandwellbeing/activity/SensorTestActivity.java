@@ -3,6 +3,7 @@ package de.uni_augsburg.mobilesensingforfitnessandwellbeing.activity;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.AccSensor;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.GpsSensor;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.Sensor;
 
@@ -62,6 +63,9 @@ public class SensorTestActivity extends AppCompatActivity {
 
         Sensor gpsSensor = new GpsSensor(this);
         sensors.put(gpsSensor.getSensorName(), gpsSensor);
+
+        Sensor accSensor = new AccSensor(this);
+        sensors.put(accSensor.getSensorName(), accSensor);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, new ArrayList<String>(sensors.keySet()));
