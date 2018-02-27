@@ -19,41 +19,48 @@ import java.util.Map;
 
 public class GpsSensor extends Sensor implements LocationListener {
 
-    private final LocationManager locationManager;
+    private LocationManager locationManager;
     private List<Location> lastKnownLocations;
     private boolean isReady;
 
     public GpsSensor(Activity activity) {
         super(activity);
-        requestPermissions();
-        this.lastKnownLocations = new ArrayList<>();
-        this.locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
-        this.isReady = false;
-        registerLocationListener();
     }
 
-    private void requestPermissions() {
-        if (ActivityCompat.checkSelfPermission(this.activity, Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this.activity, Manifest.permission.ACCESS_COARSE_LOCATION) !=
-                        PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(activity,
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
-                    0);
-        }
+    @Override
+    public void initialize()
+    {
+        this.lastKnownLocations = new ArrayList<>();
+        this.locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+        this.isReady = (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) == true);
+    }
+
+    @Override
+    public String[] necessaryPermissions() {
+        return new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
     }
 
     private void registerLocationListener() {
-        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                activity, Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                    activity, Manifest.permission.ACCESS_COARSE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED) {
             throw new RuntimeException("Missing permission!");
         }
-        this.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200L, 1f, this);
+        this.locationManager.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER,
+                200L,
+                1f,
+                this);
     }
 
     @Override
     public float getCurrentlyDesiredBpm() {
         double rawSensorValue = getRawSensorValue();
-        return (float) (rawSensorValue * 150);
+        // TODO: Multiply with (height in cm / 2) instead of 100
+        return (float) (rawSensorValue * 100);
     }
 
     @Override

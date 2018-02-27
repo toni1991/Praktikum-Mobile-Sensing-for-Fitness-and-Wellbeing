@@ -92,4 +92,14 @@ public class AccSensor extends Sensor implements SensorEventListener {
     public boolean isReady() {
         return !timeOfEvents.isEmpty();
     }
+
+    @Override
+    public String[] necessaryPermissions() {
+        return new String[0];
+    }
+
+    @Override
+    public void initialize() {
+
+    }
 }

@@ -1,6 +1,9 @@
 package de.uni_augsburg.mobilesensingforfitnessandwellbeing.activity;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.CountDownTimer;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.AccSensor;
@@ -33,9 +36,12 @@ public class SensorTestActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sensor_test);
 
         findViews();
-        initSensors();
+
         initStartButton();
         initClearButton();
+
+        initSensors();
+        initSensorSpinner();
     }
 
     private void findViews() {
@@ -84,17 +90,34 @@ public class SensorTestActivity extends AppCompatActivity {
 
         // Put new sensors over here
         Sensor gpsSensor = new GpsSensor(this);
+        requestPermissions(gpsSensor.necessaryPermissions());
         sensors.put(gpsSensor.getSensorName(), gpsSensor);
 
         Sensor accSensor = new AccSensor(this);
+        requestPermissions(accSensor.necessaryPermissions());
         sensors.put(accSensor.getSensorName(), accSensor);
+    }
 
+    private void initSensorSpinner() {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, new ArrayList<String>(sensors.keySet()));
         adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
         sensorSpinner.setAdapter(adapter);
 
         sensorSpinner.setSelection(0);
+    }
+
+    private void requestPermissions(String[] permissions) {
+        for(String permission : permissions)
+        {
+            if(ActivityCompat.checkSelfPermission(this, permission) !=
+                    PackageManager.PERMISSION_GRANTED)
+            {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{permission},
+                        0);
+            }
+        }
     }
 
     private void startSensor()

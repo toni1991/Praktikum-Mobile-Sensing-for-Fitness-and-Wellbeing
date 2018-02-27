@@ -18,6 +18,10 @@ public abstract class Sensor {
 
     public abstract boolean isReady();
 
+    public abstract String[] necessaryPermissions();
+
+    public abstract void initialize();
+
     public Sensor(Activity activity) {
         this.activity = activity;
     }
