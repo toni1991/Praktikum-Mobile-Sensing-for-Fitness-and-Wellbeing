@@ -25,6 +25,7 @@ public class SensorTestActivity extends AppCompatActivity {
     private EditText logText;
     private Button startButton;
     private CountDownTimer countDownTimer;
+    private Button clearButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,13 +35,25 @@ public class SensorTestActivity extends AppCompatActivity {
         this.logText = findViewById(R.id.logText);
         this.sensorSpinner = findViewById(R.id.sensorSpinner);
         this.startButton = findViewById(R.id.startButton);
+        this.clearButton = findViewById(R.id.startButton);
 
         initSensors();
-
-        initButton();
+        initStartButton();
+        initClearButton();
     }
 
-    private void initButton() {
+    private void initClearButton() {
+        this.clearButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v)
+            {
+                logText.setText("");
+            }
+        });
+    }
+
+    private void initStartButton() {
         this.startButton.setText(R.string.button_start);
         this.startButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,6 +74,7 @@ public class SensorTestActivity extends AppCompatActivity {
     private void initSensors() {
         sensors = new HashMap<>();
 
+        // Put new sensors over here
         Sensor gpsSensor = new GpsSensor(this);
         sensors.put(gpsSensor.getSensorName(), gpsSensor);
 
