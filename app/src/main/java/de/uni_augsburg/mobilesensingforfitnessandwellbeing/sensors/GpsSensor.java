@@ -13,30 +13,23 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class GpsSensor extends Sensor implements LocationListener {
 
     private final LocationManager locationManager;
-
+    private List<Location> lastKnownLocations;
     private boolean isReady;
-
-    private List<Location> lastKnownLocations = null;
 
     public GpsSensor(Activity activity) {
         super(activity);
-        locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
         requestPermissions();
-        isReady = false;
+        this.lastKnownLocations = new ArrayList<>();
+        this.locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+        this.isReady = false;
         registerLocationListener();
-    }
-
-    private void registerLocationListener() {
-        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            throw new RuntimeException("Missing permission!");
-        }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200L, 1f, this);
     }
 
     private void requestPermissions() {
@@ -50,6 +43,13 @@ public class GpsSensor extends Sensor implements LocationListener {
         }
     }
 
+    private void registerLocationListener() {
+        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            throw new RuntimeException("Missing permission!");
+        }
+        this.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 200L, 1f, this);
+    }
+
     @Override
     public float getCurrentlyDesiredBpm() {
         double rawSensorValue = getRawSensorValue();
@@ -57,15 +57,7 @@ public class GpsSensor extends Sensor implements LocationListener {
     }
 
     @Override
-    public String getSensorName() {
-        return "GPS Sensor";
-    }
-
-    @Override
     public double getRawSensorValue() {
-        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            throw new RuntimeException("Missing permission!");
-        }
         if (isReady()) {
             Location lastKnownLocation = lastKnownLocations.get(lastKnownLocations.size()-1);
             Log.d(this.getSensorName(), String.format("Lat: %s, Long: %s, Time: %s",
@@ -76,6 +68,11 @@ public class GpsSensor extends Sensor implements LocationListener {
         } else {
             return -1;
         }
+    }
+
+    @Override
+    public String getSensorName() {
+        return "GPS Sensor";
     }
 
     @Override

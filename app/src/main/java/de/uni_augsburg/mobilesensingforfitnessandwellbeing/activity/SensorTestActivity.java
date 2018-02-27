@@ -32,14 +32,17 @@ public class SensorTestActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sensor_test);
 
-        this.logText = findViewById(R.id.logText);
-        this.sensorSpinner = findViewById(R.id.sensorSpinner);
-        this.startButton = findViewById(R.id.startButton);
-        this.clearButton = findViewById(R.id.startButton);
-
+        findViews();
         initSensors();
         initStartButton();
         initClearButton();
+    }
+
+    private void findViews() {
+        this.logText = findViewById(R.id.logText);
+        this.sensorSpinner = findViewById(R.id.sensorSpinner);
+        this.startButton = findViewById(R.id.startButton);
+        this.clearButton = findViewById(R.id.clearButton);
     }
 
     private void initClearButton() {
@@ -48,7 +51,12 @@ public class SensorTestActivity extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-                logText.setText("");
+                logText.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        logText.setText("");
+                    }
+                });
             }
         });
     }
@@ -93,7 +101,6 @@ public class SensorTestActivity extends AppCompatActivity {
     {
         this.countDownTimer = new CountDownTimer(Long.MAX_VALUE, 1000) {
 
-            // This is called after every 10 sec interval.
             public void onTick(long millisUntilFinished) {
                 Sensor sensor  = sensors.get(sensorSpinner.getSelectedItem().toString());
                 if(sensor.isReady())
@@ -105,7 +112,7 @@ public class SensorTestActivity extends AppCompatActivity {
                     );
                 }
                 else {
-                    logText.append("Sensor is not ready.");
+                    logText.append("Sensor is not ready.\n");
                 }
             }
 

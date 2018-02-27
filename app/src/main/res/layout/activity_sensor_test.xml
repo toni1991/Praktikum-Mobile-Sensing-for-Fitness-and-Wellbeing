@@ -9,34 +9,53 @@
 
     <EditText
         android:id="@+id/logText"
-        android:layout_width="354dp"
-        android:layout_height="217dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="54dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="54dp"
         android:ems="10"
-        android:inputType="textMultiLine"
-        tools:layout_editor_absoluteX="15dp"
-        tools:layout_editor_absoluteY="54dp" />
+        android:inputType="textMultiLine|textNoSuggestions"
+        android:textAlignment="viewStart"
+        app:layout_constraintBottom_toTopOf="@+id/sensorSpinner"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:enabled="false" />
 
     <Spinner
         android:id="@+id/sensorSpinner"
-        android:layout_width="250dp"
-        android:layout_height="53dp"
-        tools:layout_editor_absoluteX="67dp"
-        tools:layout_editor_absoluteY="325dp" />
+        android:layout_width="0dp"
+        android:layout_height="43dp"
+        android:layout_marginBottom="47dp"
+        android:layout_marginEnd="67dp"
+        android:layout_marginStart="67dp"
+        app:layout_constraintBottom_toTopOf="@+id/clearButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logText" />
 
     <Button
         android:id="@+id/startButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="38dp"
+        android:layout_marginEnd="7dp"
         android:text="Button"
-        tools:layout_editor_absoluteX="67dp"
-        tools:layout_editor_absoluteY="425dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/clearButton"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/clearButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="38dp"
         android:text="Clear"
-        tools:layout_editor_absoluteX="229dp"
-        tools:layout_editor_absoluteY="425dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/startButton"
+        app:layout_constraintTop_toBottomOf="@+id/sensorSpinner" />
 
 </android.support.constraint.ConstraintLayout>
