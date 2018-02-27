@@ -23,11 +23,12 @@ import java.util.Map;
 
 public class SensorTestActivity extends AppCompatActivity {
 
-    private Map<String, Sensor> sensors;
-    private Spinner sensorSpinner;
-    private EditText logText;
-    private Button startButton;
     private CountDownTimer countDownTimer;
+    private Map<String, Sensor> sensors;
+
+    private EditText logText;
+    private Spinner sensorSpinner;
+    private Button startButton;
     private Button clearButton;
 
     @Override
@@ -60,7 +61,7 @@ public class SensorTestActivity extends AppCompatActivity {
                 logText.post(new Runnable() {
                     @Override
                     public void run() {
-                        logText.setText("");
+                        logText.getText().clear();
                     }
                 });
             }
@@ -122,10 +123,12 @@ public class SensorTestActivity extends AppCompatActivity {
 
     private void startSensor()
     {
+        final Sensor sensor  = sensors.get(sensorSpinner.getSelectedItem().toString());
+        sensor.initialize();
+
         this.countDownTimer = new CountDownTimer(Long.MAX_VALUE, 1000) {
 
             public void onTick(long millisUntilFinished) {
-                Sensor sensor  = sensors.get(sensorSpinner.getSelectedItem().toString());
                 if(sensor.isReady())
                 {
                     logText.append(String.format("%s: %s (%s) \n",

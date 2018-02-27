@@ -33,6 +33,7 @@ public class GpsSensor extends Sensor implements LocationListener {
         this.lastKnownLocations = new ArrayList<>();
         this.locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
         this.isReady = (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) == true);
+        registerLocationListener();
     }
 
     @Override
