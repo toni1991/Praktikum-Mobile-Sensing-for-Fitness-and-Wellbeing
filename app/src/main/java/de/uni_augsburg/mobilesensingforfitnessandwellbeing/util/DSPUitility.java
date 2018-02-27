@@ -8,7 +8,7 @@ import java.util.LinkedList;
 
 public class DSPUitility {
 
-    static double[] getHammingWindowFactors(int windowSize) {
+    public static double[] getHammingWindowFactors(int windowSize) {
         // precompute factors for given window, avoid re-calculating for several instances
         double[] factors;
 
@@ -20,7 +20,7 @@ public class DSPUitility {
         return factors;
     }
 
-    static double calculateShortTermEnergy(LinkedList<Float> signal, int start, int windowlength )
+    public static double calculateShortTermEnergy(LinkedList<Float> signal, int start, int windowlength )
     {
         if (signal.size() - start - windowlength < 0)
             throw new IndexOutOfBoundsException("start and window length are outside of the signal");
@@ -29,7 +29,7 @@ public class DSPUitility {
         double totalEnergy = 0;
         for (int i = start; i < start+windowlength; i++)
         {
-            totalEnergy += factors[i-start] * (signal.get(i)*signal.get(i));
+            totalEnergy += factors[i-start] * ((signal.get(i)-10)*(signal.get(i)-10));
         }
         return totalEnergy;
     }

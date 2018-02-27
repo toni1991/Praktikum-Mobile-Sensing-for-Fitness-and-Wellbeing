@@ -7,7 +7,8 @@ import android.hardware.SensorManager;
 import android.app.Activity;
 
 import java.util.LinkedList;
-import java.util.Queue;
+
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.DSPUitility;
 
 /**
  * Created by lukas on 26.02.18.
@@ -15,10 +16,10 @@ import java.util.Queue;
 
 public class AccSensor extends Sensor implements SensorEventListener {
 
-    private Queue<Long> timeOfEvents;
-    private Queue<Float> xEvents;
-    private Queue<Float> yEvents;
-    private Queue<Float> zEvents;
+    private LinkedList<Long> timeOfEvents;
+    private LinkedList<Float> xEvents;
+    private LinkedList<Float> yEvents;
+    private LinkedList<Float> zEvents;
 
     public AccSensor (Activity activity)
     {
@@ -71,7 +72,7 @@ public class AccSensor extends Sensor implements SensorEventListener {
 
     @Override
     public float getCurrentlyDesiredBpm() {
-        return timeOfEvents.size();
+        return (float)DSPUitility.calculateShortTermEnergy(yEvents,0,50);
     }
 
     @Override
@@ -86,7 +87,7 @@ public class AccSensor extends Sensor implements SensorEventListener {
 
     @Override
     public boolean isReady() {
-        return !timeOfEvents.isEmpty();
+        return (timeOfEvents.size() >= 50);
     }
 
     @Override
