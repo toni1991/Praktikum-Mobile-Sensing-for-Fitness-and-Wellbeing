@@ -21,12 +21,12 @@ public class AccSensor extends Sensor implements SensorEventListener {
     private LinkedList<Float> yEvents;
     private LinkedList<Float> zEvents;
 
-    public AccSensor (Activity activity)
+    public AccSensor (Context context)
     {
-        super(activity);
+        super(context);
         super.setWindowLengthMillis(1500);
 
-        senSensorManager = (SensorManager) activity.getSystemService(Context.SENSOR_SERVICE);
+        senSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         senAccelerometer = senSensorManager.getDefaultSensor(android.hardware.Sensor.TYPE_ACCELEROMETER);
         senSensorManager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 

@@ -20,7 +20,8 @@ public class MediaView extends ConstraintLayout {
     private TextView mediaCurrentTimeTextView;
     private TextView mediaTotalTimeTextView;
     private TextView mediaTitleTextView;
-    private ImageButton mediaButton;
+    private ImageButton mediaPlayPauseButton;
+    private ImageButton mediaSkipButton;
 
     private boolean isPlaying = false;
 
@@ -47,7 +48,7 @@ public class MediaView extends ConstraintLayout {
     }
 
     private void initMediaButtonListener() {
-        this.mediaButton.setOnClickListener(new OnClickListener() {
+        this.mediaPlayPauseButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(isPlaying) {
@@ -62,11 +63,11 @@ public class MediaView extends ConstraintLayout {
     }
 
     private void pausePlaying() {
-        mediaButton.setImageResource(android.R.drawable.ic_media_pause);
+        mediaPlayPauseButton.setImageResource(android.R.drawable.ic_media_pause);
     }
 
     private void startPlaying() {
-        mediaButton.setImageResource(android.R.drawable.ic_media_play);
+        mediaPlayPauseButton.setImageResource(android.R.drawable.ic_media_play);
     }
 
     private void inflateLayout(Context context) {
@@ -74,7 +75,8 @@ public class MediaView extends ConstraintLayout {
     }
 
     private void findViews() {
-        this.mediaButton = findViewById(R.id.mediaButton);
+        this.mediaPlayPauseButton = findViewById(R.id.mediaPlayPauseButton);
+        this.mediaSkipButton = findViewById(R.id.mediaSkipButton);
         this.mediaCurrentTimeTextView = findViewById(R.id.mediaCurrentTimeTextView);
         this.mediaTotalTimeTextView = findViewById(R.id.mediaTotalTimeTextView);
         this.mediaTitleTextView = findViewById(R.id.mediaTitleTextView);

@@ -8,7 +8,7 @@ public abstract class Sensor {
 
     protected int windowLengthMillis;
 
-    protected Activity activity;
+    protected Context context;
 
     public abstract float getCurrentlyDesiredBpm();
 
@@ -22,8 +22,8 @@ public abstract class Sensor {
 
     public abstract void initialize();
 
-    public Sensor(Activity activity) {
-        this.activity = activity;
+    public Sensor(Context context) {
+        this.context = context;
     }
 
     public void setWindowLengthMillis(int windowLenghtMillis) {

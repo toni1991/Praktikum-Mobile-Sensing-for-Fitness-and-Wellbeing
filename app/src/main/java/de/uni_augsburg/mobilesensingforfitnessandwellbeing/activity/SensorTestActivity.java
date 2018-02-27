@@ -1,8 +1,10 @@
 package de.uni_augsburg.mobilesensingforfitnessandwellbeing.activity;
 
 import android.Manifest;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.CountDownTimer;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
@@ -19,7 +21,9 @@ import android.widget.Spinner;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class SensorTestActivity extends AppCompatActivity {
 
@@ -89,14 +93,21 @@ public class SensorTestActivity extends AppCompatActivity {
     private void initSensors() {
         sensors = new HashMap<>();
 
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
+        Set<String> activatedSensors  = settings.getStringSet("pref_sensors", new HashSet<String>());
+
         // Put new sensors over here
         Sensor gpsSensor = new GpsSensor(this);
-        requestPermissions(gpsSensor.necessaryPermissions());
-        sensors.put(gpsSensor.getSensorName(), gpsSensor);
+        if(activatedSensors.contains(gpsSensor.getSensorName())) {
+            requestPermissions(gpsSensor.necessaryPermissions());
+            sensors.put(gpsSensor.getSensorName(), gpsSensor);
+        }
 
         Sensor accSensor = new AccSensor(this);
-        requestPermissions(accSensor.necessaryPermissions());
-        sensors.put(accSensor.getSensorName(), accSensor);
+        if(activatedSensors.contains(accSensor.getSensorName())) {
+            requestPermissions(accSensor.necessaryPermissions());
+            sensors.put(accSensor.getSensorName(), accSensor);
+        }
     }
 
     private void initSensorSpinner() {
