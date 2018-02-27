@@ -15,7 +15,6 @@ import java.util.Queue;
 
 public class AccSensor extends Sensor implements SensorEventListener {
 
-    private int tmp;
     private Queue<Long> timeOfEvents;
     private Queue<Float> xEvents;
     private Queue<Float> yEvents;
@@ -26,15 +25,14 @@ public class AccSensor extends Sensor implements SensorEventListener {
         super(activity);
         super.setWindowLengthMillis(1500);
 
-        tmp = 0;
         senSensorManager = (SensorManager) activity.getSystemService(Context.SENSOR_SERVICE);
         senAccelerometer = senSensorManager.getDefaultSensor(android.hardware.Sensor.TYPE_ACCELEROMETER);
         senSensorManager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
-        xEvents = new LinkedList<Float>();
-        yEvents = new LinkedList<Float>();
-        zEvents = new LinkedList<Float>();
-        timeOfEvents = new LinkedList<Long>();
+        xEvents = new LinkedList<>();
+        yEvents = new LinkedList<>();
+        zEvents = new LinkedList<>();
+        timeOfEvents = new LinkedList<>();
     }
 
     private SensorManager senSensorManager;
@@ -47,8 +45,6 @@ public class AccSensor extends Sensor implements SensorEventListener {
         timeOfEvents.add(System.currentTimeMillis());
 
         if (mySensor.getType() == android.hardware.Sensor.TYPE_ACCELEROMETER) {
-            tmp++;
-
             xEvents.add(sensorEvent.values[0]);
             yEvents.add(sensorEvent.values[1]);
             zEvents.add(sensorEvent.values[2]);
