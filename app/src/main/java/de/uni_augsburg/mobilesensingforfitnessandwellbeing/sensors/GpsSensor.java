@@ -42,13 +42,12 @@ public class GpsSensor extends Sensor implements LocationListener {
     }
 
     private void registerLocationListener() {
-        if (ActivityCompat.checkSelfPermission(
-                activity, Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED &&
-            ActivityCompat.checkSelfPermission(
-                    activity, Manifest.permission.ACCESS_COARSE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED) {
-            throw new RuntimeException("Missing permission!");
+        for(String permission : necessaryPermissions())
+        {
+            if(ActivityCompat.checkSelfPermission( activity, permission) != PackageManager.PERMISSION_GRANTED) {
+                throw new RuntimeException("Missing permission!");
+
+            }
         }
         this.locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER,
