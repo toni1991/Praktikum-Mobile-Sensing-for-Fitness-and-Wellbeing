@@ -27,9 +27,20 @@ public class DSPUitility {
 
         double factors[] = getHammingWindowFactors(windowlength);
         double totalEnergy = 0;
+
+        double total = 0;
+        int count = 0;
         for (int i = start; i < start+windowlength; i++)
         {
-            totalEnergy += factors[i-start] * ((signal.get(i)-10)*(signal.get(i)-10));
+            total += signal.get(i);
+            count++;
+        }
+
+        double average = total / count;
+
+        for (int i = start; i < start+windowlength; i++)
+        {
+            totalEnergy += factors[i-start] * (Math.pow(signal.get(i)-average,2));
         }
         return totalEnergy;
     }
