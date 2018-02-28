@@ -92,7 +92,7 @@ public class JBpmMusicService extends Service {
                 .setOngoing(true)
                 .build();
 
-        startForeground(JBpmMusicService.NOTIFICATION.FOREGROUND_SERVICE,
+        startForeground(MediaServiceConstants.NOTIFICATION.FOREGROUND_SERVICE,
                 notification);
     }
 
