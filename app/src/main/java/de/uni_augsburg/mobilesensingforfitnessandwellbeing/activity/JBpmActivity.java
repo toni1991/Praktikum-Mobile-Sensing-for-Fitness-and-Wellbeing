@@ -3,6 +3,7 @@ package de.uni_augsburg.mobilesensingforfitnessandwellbeing.activity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.provider.SyncStateContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.BpmMappedSong;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.LocalMusicProvider;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MediaListener;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MediaServiceConstants;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MusicProvider;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.service.JBpmMusicService;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.view.InfoView;
@@ -42,8 +44,19 @@ public class JBpmActivity extends AppCompatActivity {
                 );
         findViews();
         init();
+    }
 
-        this.musicProvider = new LocalMusicProvider(this);
+    private void startMusicService() {
+        Intent service = new Intent(this, JBpmMusicService.class);
+        if (!JBpmMusicService.IS_SERVICE_RUNNING) {
+            service.setAction(MediaServiceConstants.ACTION.STARTFOREGROUND_ACTION);
+            JBpmMusicService.IS_SERVICE_RUNNING = true;
+        } else {
+            service.setAction(MediaServiceConstants.ACTION.STOPFOREGROUND_ACTION);
+            JBpmMusicService.IS_SERVICE_RUNNING = false;
+
+        }
+        startService(service);
     }
 
     private void requestPermissions(String[] permissions) {
@@ -86,8 +99,9 @@ public class JBpmActivity extends AppCompatActivity {
     }
 
     private void init() {
-        mediaView.setMediaTotalTime(246);
-        mediaView.setMediaListener(new MediaListener() {
+        this.musicProvider = new LocalMusicProvider(this);
+        this.mediaView.setMediaTotalTime(246);
+        this.mediaView.setMediaListener(new MediaListener() {
 
             @Override
             public void onSkip(BpmMappedSong bpmMappedSong) {
@@ -99,7 +113,7 @@ public class JBpmActivity extends AppCompatActivity {
 
             @Override
             public void onPlayStatusChange(boolean isPlaying) {
-                // TODO
+                startMusicService();
             }
         });
     }
