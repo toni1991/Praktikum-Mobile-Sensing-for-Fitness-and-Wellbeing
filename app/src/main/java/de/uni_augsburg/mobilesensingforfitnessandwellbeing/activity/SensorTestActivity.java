@@ -1,18 +1,12 @@
 package de.uni_augsburg.mobilesensingforfitnessandwellbeing.activity;
 
-import android.Manifest;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
-import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.AccSensor;
-import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.GpsSensor;
-import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.Sensor;
-
-import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -24,6 +18,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.AccSensor;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.GpsSensor;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.Sensor;
 
 public class SensorTestActivity extends AppCompatActivity {
 
@@ -60,8 +59,7 @@ public class SensorTestActivity extends AppCompatActivity {
         this.clearButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 logText.post(new Runnable() {
                     @Override
                     public void run() {
@@ -77,12 +75,10 @@ public class SensorTestActivity extends AppCompatActivity {
         this.startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(startButton.getText() == getResources().getString(R.string.button_start))
-                {
+                if (startButton.getText() == getResources().getString(R.string.button_start)) {
                     startButton.setText(R.string.button_stop);
                     startSensor();
-                }
-                else {
+                } else {
                     countDownTimer.cancel();
                     startButton.setText(R.string.button_start);
                 }
@@ -94,17 +90,17 @@ public class SensorTestActivity extends AppCompatActivity {
         sensors = new HashMap<>();
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        Set<String> activatedSensors  = settings.getStringSet("pref_sensors", new HashSet<String>());
+        Set<String> activatedSensors = settings.getStringSet("pref_sensors", new HashSet<String>());
 
         // Put new sensors over here
         Sensor gpsSensor = new GpsSensor(this);
-        if(activatedSensors.contains(gpsSensor.getSensorName())) {
+        if (activatedSensors.contains(gpsSensor.getSensorName())) {
             requestPermissions(gpsSensor.necessaryPermissions());
             sensors.put(gpsSensor.getSensorName(), gpsSensor);
         }
 
         Sensor accSensor = new AccSensor(this);
-        if(activatedSensors.contains(accSensor.getSensorName())) {
+        if (activatedSensors.contains(accSensor.getSensorName())) {
             requestPermissions(accSensor.necessaryPermissions());
             sensors.put(accSensor.getSensorName(), accSensor);
         }
@@ -112,7 +108,7 @@ public class SensorTestActivity extends AppCompatActivity {
 
     private void initSensorSpinner() {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, new ArrayList<String>(sensors.keySet()));
+                android.R.layout.simple_spinner_item, new ArrayList<>(sensors.keySet()));
         adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
         sensorSpinner.setAdapter(adapter);
 
@@ -120,11 +116,9 @@ public class SensorTestActivity extends AppCompatActivity {
     }
 
     private void requestPermissions(String[] permissions) {
-        for(String permission : permissions)
-        {
-            if(ActivityCompat.checkSelfPermission(this, permission) !=
-                    PackageManager.PERMISSION_GRANTED)
-            {
+        for (String permission : permissions) {
+            if (ActivityCompat.checkSelfPermission(this, permission) !=
+                    PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this,
                         new String[]{permission},
                         0);
@@ -132,23 +126,20 @@ public class SensorTestActivity extends AppCompatActivity {
         }
     }
 
-    private void startSensor()
-    {
-        final Sensor sensor  = sensors.get(sensorSpinner.getSelectedItem().toString());
+    private void startSensor() {
+        final Sensor sensor = sensors.get(sensorSpinner.getSelectedItem().toString());
         sensor.initialize();
 
         this.countDownTimer = new CountDownTimer(Long.MAX_VALUE, 1000) {
 
             public void onTick(long millisUntilFinished) {
-                if(sensor.isReady())
-                {
+                if (sensor.isReady()) {
                     logText.append(String.format("%s: %s (%s) \n",
                             sensor.getSensorName(),
                             sensor.getCurrentlyDesiredBpm(),
                             sensor.getRawSensorValue())
                     );
-                }
-                else {
+                } else {
                     logText.append("Sensor is not ready.\n");
                 }
             }
