@@ -1,18 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <PreferenceCategory
-        android:title="Misc"
-        android:key="pref_key_misc">
-
-        <EditTextPreference
-            android:key="pref_height"
-            android:title="@string/settings_height"
-            android:summary="@string/settings_summary_height"
-            android:inputType="number"
-            android:numeric="integer"
-            android:defaultValue="175" />
-
-    </PreferenceCategory>
-
 </PreferenceScreen>

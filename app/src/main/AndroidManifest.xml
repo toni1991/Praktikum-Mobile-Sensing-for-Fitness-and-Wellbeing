@@ -4,6 +4,8 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
@@ -16,12 +18,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.SensorTestActivity"
+        <activity
+            android:name=".activity.SensorTestActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.uni_augsburg.mobilesensingforfitnessandwellbeing.activity.JBpmActivity" />
+
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -32,6 +36,7 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -43,6 +48,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="de.uni_augsburg.mobilesensingforfitnessandwellbeing.activity.JBpmActivity" />
         </activity>
+
+        <service
+            android:name=".service.JBpmMusicService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
