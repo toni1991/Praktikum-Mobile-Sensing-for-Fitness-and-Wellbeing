@@ -100,7 +100,7 @@ public class JBpmActivity extends AppCompatActivity {
 
     private void init() {
         this.musicProvider = new LocalMusicProvider(this);
-        this.mediaView.setMediaTotalTime(246);
+        this.mediaView.setCurrentSong(this.musicProvider.getNextSong(100));
         this.mediaView.setMediaListener(new MediaListener() {
 
             @Override
