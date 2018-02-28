@@ -57,7 +57,7 @@ public class MediaView extends ConstraintLayout {
     }
 
     private void initMediaSkipButtonListener() {
-        this.mediaSkipButton.setOnClickListener((View v) -> this.mediaListener.onSkip(this.currentSong));
+        this.mediaSkipButton.setOnClickListener((View v) -> this.mediaListener.onSkip());
     }
 
     private void initMediaPlayPauseButtonListener() {
@@ -97,7 +97,7 @@ public class MediaView extends ConstraintLayout {
         this.mediaProgressBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                setMediaCurrentTime(progress);
+                setMediaCurrentTime(seekBar.getProgress());
             }
 
             @Override
@@ -107,7 +107,7 @@ public class MediaView extends ConstraintLayout {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                mediaListener.onSeekbarProgressChange(seekBar.getProgress());
             }
         });
     }

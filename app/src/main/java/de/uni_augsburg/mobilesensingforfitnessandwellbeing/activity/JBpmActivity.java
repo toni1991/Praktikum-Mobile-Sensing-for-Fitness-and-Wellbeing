@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.security.Permission;
 
@@ -104,9 +105,9 @@ public class JBpmActivity extends AppCompatActivity {
         this.mediaView.setMediaListener(new MediaListener() {
 
             @Override
-            public void onSkip(BpmMappedSong bpmMappedSong) {
-                musicProvider.dislike(bpmMappedSong);
-                bpmMappedSong = musicProvider.getNextSong(100f);
+            public void onSkip() {
+                musicProvider.dislike(null); // TODO: Get current song from music service
+                BpmMappedSong bpmMappedSong = musicProvider.getNextSong(100f); // TODO: Get current desired BPM From bpm service
                 mediaView.setCurrentSong(bpmMappedSong);
                 infoView.setCurrentSong(bpmMappedSong);
             }
@@ -114,6 +115,11 @@ public class JBpmActivity extends AppCompatActivity {
             @Override
             public void onPlayStatusChange(boolean isPlaying) {
                 startMusicService();
+            }
+
+            @Override
+            public void onSeekbarProgressChange(int progress) {
+                Toast.makeText(JBpmActivity.this, ""+progress, Toast.LENGTH_SHORT).show();
             }
         });
     }
