@@ -22,25 +22,15 @@ public class DSPUitility {
 
     public static double calculateShortTermEnergy(LinkedList<Float> signal, int start, int windowlength )
     {
-        if (signal.size() - start - windowlength < 0)
+        if ( start + windowlength > signal.size())
             throw new IndexOutOfBoundsException("start and window length are outside of the signal");
 
         double factors[] = getHammingWindowFactors(windowlength);
         double totalEnergy = 0;
 
-        double total = 0;
-        int count = 0;
         for (int i = start; i < start+windowlength; i++)
         {
-            total += signal.get(i);
-            count++;
-        }
-
-        double average = total / count;
-
-        for (int i = start; i < start+windowlength; i++)
-        {
-            totalEnergy += factors[i-start] * (Math.pow(signal.get(i)-average,2));
+            totalEnergy += factors[i-start] * (Math.pow(signal.get(i),2));
         }
         return totalEnergy;
     }
