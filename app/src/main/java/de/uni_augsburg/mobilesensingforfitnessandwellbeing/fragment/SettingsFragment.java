@@ -64,8 +64,7 @@ public class SettingsFragment extends PreferenceFragment  implements
         EditTextPreference mediaDirectoryPreference = new EditTextPreference(preferenceScreen.getContext());
         mediaDirectoryPreference.setKey("pref_media_directory");
         mediaDirectoryPreference.setTitle(getResources().getString(R.string.settings_media_directory));
-        mediaDirectoryPreference.getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
-        mediaDirectoryPreference.setDefaultValue( Environment.getExternalStorageDirectory() + "/media");
+        mediaDirectoryPreference.setDefaultValue( Environment.getExternalStorageDirectory() + "/Music");
 
         preferenceCategory.addPreference(mediaDirectoryPreference);
 

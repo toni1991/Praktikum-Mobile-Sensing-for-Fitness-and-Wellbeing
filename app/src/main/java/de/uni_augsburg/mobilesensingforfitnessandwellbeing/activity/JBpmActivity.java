@@ -13,6 +13,11 @@ import android.view.MenuItem;
 import java.security.Permission;
 
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.BpmMappedSong;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.LocalMusicProvider;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MediaListener;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MusicProvider;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.service.JBpmMusicService;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.view.InfoView;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.view.MediaView;
 
@@ -20,6 +25,11 @@ public class JBpmActivity extends AppCompatActivity {
 
     private InfoView infoView;
     private MediaView mediaView;
+    private MusicProvider musicProvider;
+
+    /*private JBpmMusicService musicService;
+    private Intent playIntent;
+    private boolean musicBound=false;*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +42,8 @@ public class JBpmActivity extends AppCompatActivity {
                 );
         findViews();
         init();
+
+        this.musicProvider = new LocalMusicProvider(this);
     }
 
     private void requestPermissions(String[] permissions) {
@@ -75,5 +87,20 @@ public class JBpmActivity extends AppCompatActivity {
 
     private void init() {
         mediaView.setMediaTotalTime(246);
+        mediaView.setMediaListener(new MediaListener() {
+
+            @Override
+            public void onSkip(BpmMappedSong bpmMappedSong) {
+                musicProvider.dislike(bpmMappedSong);
+                bpmMappedSong = musicProvider.getNextSong(100f);
+                mediaView.setCurrentSong(bpmMappedSong);
+                infoView.setCurrentSong(bpmMappedSong);
+            }
+
+            @Override
+            public void onPlayStatusChange(boolean isPlaying) {
+                // TODO
+            }
+        });
     }
 }
