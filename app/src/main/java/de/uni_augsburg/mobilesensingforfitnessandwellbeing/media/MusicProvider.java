@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 
+import java.io.File;
+
 /**
  * Created by toni on 28.02.18.
  */
@@ -23,10 +25,10 @@ public abstract class  MusicProvider {
 
     public abstract void dislike(BpmMappedSong bpmMappedSong);
 
-    final protected Uri getMediaDirectory()
+    final protected File getMediaDirectory()
     {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this.context);
-        return Uri.parse(settings.getString("pref_media_directory", ""));
+        return new File(settings.getString("pref_media_directory", ""));
     }
 
 }
