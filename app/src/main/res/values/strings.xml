@@ -11,4 +11,5 @@
     <string name="settings_sensors">Sensors</string>
     <string name="settings_summary_sensors">Sensors to use</string>
     <string name="settings_media_directory">Media Directory</string>
+    <string name="stop_music_service">Stop music service</string>
 </resources>

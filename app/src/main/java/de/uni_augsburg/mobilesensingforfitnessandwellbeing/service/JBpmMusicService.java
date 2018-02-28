@@ -3,31 +3,110 @@ package de.uni_augsburg.mobilesensingforfitnessandwellbeing.service;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.IntentFilter;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import de.uni_augsburg.mobilesensingforfitnessandwellbeing.activity.JBpmActivity;
-import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MediaServiceConstants;
+import java.io.File;
+import java.io.IOException;
 
-public class JBpmMusicService extends Service {
-    private static final String LOG_TAG = "ForegroundService";
-    public static boolean IS_SERVICE_RUNNING = false;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.activity.JBpmActivity;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.BpmMappedSong;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MediaServiceConstants;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
+
+public class JBpmMusicService extends Service implements MediaPlayer.OnPreparedListener {
+
+    private MediaPlayer mMediaPlayer = null;
+    private BpmMappedSong currentSong;
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            switch (intent.getAction()) {
+                case BroadcastAction.PLAYBACK.PLAY.ACTION:
+                    if (mMediaPlayer != null) {
+                        mMediaPlayer.start();
+                    }
+                    break;
+                case BroadcastAction.PLAYBACK.PAUSE.ACTION:
+                    if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+                        mMediaPlayer.pause();
+                    }
+                    break;
+                case BroadcastAction.PLAYBACK.SKIP.ACTION:
+                    break;
+                case BroadcastAction.FILE.NEXT_SONG.ACTION:
+                    prepareNewSong(intent);
+                    break;
+                case BroadcastAction.FILE.REQUEST_CURRENT_SONG.ACTION:
+                    Intent broadcast = new Intent();
+                    broadcast.setAction(BroadcastAction.FILE.CURRENT_SONG.ACTION);
+                    broadcast.putExtra(BroadcastAction.FILE.CURRENT_SONG.EXTRA_SONG, currentSong);
+                    break;
+            }
+
+            Log.d("Service", intent.getAction() + intent.getStringExtra("testExtra"));
+        }
+    };
+
+    private void prepareNewSong(Intent intent) {
+        this.currentSong = intent.getParcelableExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG);
+        if (this.currentSong != null && !new File(this.currentSong.getAudioFile()).exists()) {
+            return;
+        }
+
+        if (mMediaPlayer.isPlaying()) {
+            mMediaPlayer.stop();
+        }
+
+        try {
+            mMediaPlayer.setDataSource(
+                    getApplicationContext(), Uri.parse(currentSong.getAudioFile())
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        mMediaPlayer.prepareAsync(); // prepare async to not block main thread
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        initMediaPlayer();
+        registerBroadcastReceiver();
+    }
+
+    private void initMediaPlayer() {
+        mMediaPlayer = new MediaPlayer();
+        mMediaPlayer.setOnPreparedListener(this);
+    }
+
+    private void registerBroadcastReceiver() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BroadcastAction.PLAYBACK.PLAY.ACTION);
+        filter.addAction(BroadcastAction.PLAYBACK.PAUSE.ACTION);
+        filter.addAction(BroadcastAction.PLAYBACK.SKIP.ACTION);
+        filter.addAction(BroadcastAction.FILE.NEXT_SONG.ACTION);
+        registerReceiver(this.broadcastReceiver, filter);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent.getAction().equals(MediaServiceConstants.ACTION.STARTFOREGROUND_ACTION)) {
+        showNotification();
+
+        /*if (intent.getAction().equals(MediaServiceConstants.ACTION.STARTFOREGROUND_ACTION)) {
             Log.i(LOG_TAG, "Received Start Foreground Intent ");
-            showNotification();
+
             Toast.makeText(this, "Service Started!", Toast.LENGTH_SHORT).show();
 
         } else if (intent.getAction().equals(MediaServiceConstants.ACTION.PREV_ACTION)) {
@@ -48,41 +127,28 @@ public class JBpmMusicService extends Service {
             Log.i(LOG_TAG, "Received Stop Foreground Intent");
             stopForeground(true);
             stopSelf();
-        }
+        }*/
+
         return START_STICKY;
     }
 
     private void showNotification() {
-        Intent notificationIntent = new Intent(this, JBpmActivity.class);
-        notificationIntent.setAction(MediaServiceConstants.ACTION.MAIN_ACTION);
-        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
-                notificationIntent, 0);
-
-        Intent previousIntent = new Intent(this, JBpmMusicService.class);
-        previousIntent.setAction(MediaServiceConstants.ACTION.PREV_ACTION);
-        PendingIntent ppreviousIntent = PendingIntent.getService(this, 0,
-                previousIntent, 0);
+        PendingIntent mainActivityPendingIntent = getMainActivityPendingIntent();
 
         Intent playIntent = new Intent(this, JBpmMusicService.class);
-        playIntent.setAction(MediaServiceConstants.ACTION.PLAY_ACTION);
+        playIntent.setAction(BroadcastAction.PLAYBACK.PLAY.ACTION);
         PendingIntent pplayIntent = PendingIntent.getService(this, 0,
                 playIntent, 0);
 
         Intent nextIntent = new Intent(this, JBpmMusicService.class);
-        nextIntent.setAction(MediaServiceConstants.ACTION.NEXT_ACTION);
+        nextIntent.setAction(BroadcastAction.PLAYBACK.SKIP.ACTION);
         PendingIntent pnextIntent = PendingIntent.getService(this, 0,
                 nextIntent, 0);
 
-        Bitmap icon = BitmapFactory.decodeResource(getResources(),
-                android.R.drawable.ic_menu_compass);
-
         Notification notification = new NotificationCompat.Builder(this, MediaServiceConstants.NOTIFICATION.CHANNEL_ID)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setSmallIcon(android.R.drawable.zoom_plate)
-                .addAction(android.R.drawable.ic_media_previous, "Previous", ppreviousIntent) // #0
+                .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                .setContentIntent(mainActivityPendingIntent)
                 .addAction(android.R.drawable.ic_media_pause, "Pause", pplayIntent)  // #1
                 .addAction(android.R.drawable.ic_media_next, "Next", pnextIntent)     // #2
                 .setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle()
@@ -96,10 +162,15 @@ public class JBpmMusicService extends Service {
                 notification);
     }
 
+    private PendingIntent getMainActivityPendingIntent() {
+        Intent mainActivityIntent = new Intent(this, JBpmActivity.class);
+        //.setFlags(Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        return PendingIntent.getActivity(this, 0, mainActivityIntent, 0);
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.i(LOG_TAG, "In onDestroy");
         Toast.makeText(this, "Service Detroyed!", Toast.LENGTH_SHORT).show();
     }
 
@@ -107,5 +178,12 @@ public class JBpmMusicService extends Service {
     public IBinder onBind(Intent intent) {
         // Used only in case if services are bound (Bound Services).
         return null;
+    }
+
+    // Mediaplayer functions
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        Log.d("mediaplayer", "started");
+        mMediaPlayer.start();
     }
 }

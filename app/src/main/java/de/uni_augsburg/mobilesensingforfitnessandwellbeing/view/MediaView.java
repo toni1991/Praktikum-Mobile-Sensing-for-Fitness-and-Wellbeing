@@ -10,6 +10,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.BpmMappedSong;
@@ -117,9 +119,9 @@ public class MediaView extends ConstraintLayout {
         setTimeTextView(mediaTotalTimeTextView, totalTime);
     }
 
-    private void setMediaTotalTime(File audioFile) {
+    private void setMediaTotalTime(String audioFile) {
         MediaMetadataRetriever mmR = new MediaMetadataRetriever();
-        mmR.setDataSource(audioFile.getAbsolutePath());
+        mmR.setDataSource(audioFile);
         String duration = mmR.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
         setMediaTotalTime(Integer.valueOf(duration) / 1000);
     }
@@ -136,10 +138,12 @@ public class MediaView extends ConstraintLayout {
     }
 
     public void setCurrentSong(BpmMappedSong currentSong) {
-        this.currentSong = currentSong;
-        setMediaTitleOfCurrentSong();
-        setMediaTotalTimeOfCurrentSong();
-        setMediaCurrentTime(0); // Time after song change is always 0
+        if(new File(currentSong.getAudioFile()).isFile()) {
+            this.currentSong = currentSong;
+            setMediaTitleOfCurrentSong();
+            setMediaTotalTimeOfCurrentSong();
+            setMediaCurrentTime(0); // Time after song change is always 0
+        }
     }
 
     private void setMediaTitleOfCurrentSong() {

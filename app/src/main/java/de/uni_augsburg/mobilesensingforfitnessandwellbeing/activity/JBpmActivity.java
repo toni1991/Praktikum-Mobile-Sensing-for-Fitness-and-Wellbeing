@@ -1,7 +1,10 @@
 package de.uni_augsburg.mobilesensingforfitnessandwellbeing.activity;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.provider.SyncStateContract;
 import android.support.v4.app.ActivityCompat;
@@ -13,6 +16,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.security.Permission;
+import java.util.HashSet;
 
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.BpmMappedSong;
@@ -21,6 +25,7 @@ import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MediaListener;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MediaServiceConstants;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MusicProvider;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.service.JBpmMusicService;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.view.InfoView;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.view.MediaView;
 
@@ -30,34 +35,25 @@ public class JBpmActivity extends AppCompatActivity {
     private MediaView mediaView;
     private MusicProvider musicProvider;
 
-    /*private JBpmMusicService musicService;
-    private Intent playIntent;
-    private boolean musicBound=false;*/
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_j_bpm);
-
         requestPermissions(new String[]{
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE}
                 );
         findViews();
+        startMusicService();
+        //registerBroadcastReceiver();
         init();
     }
 
-    private void startMusicService() {
-        Intent service = new Intent(this, JBpmMusicService.class);
-        if (!JBpmMusicService.IS_SERVICE_RUNNING) {
-            service.setAction(MediaServiceConstants.ACTION.STARTFOREGROUND_ACTION);
-            JBpmMusicService.IS_SERVICE_RUNNING = true;
-        } else {
-            service.setAction(MediaServiceConstants.ACTION.STOPFOREGROUND_ACTION);
-            JBpmMusicService.IS_SERVICE_RUNNING = false;
 
-        }
-        startService(service);
+
+    private void startMusicService() {
+        Intent musicService = new Intent(this, JBpmMusicService.class);
+        startService(musicService);
     }
 
     private void requestPermissions(String[] permissions) {
@@ -89,6 +85,9 @@ public class JBpmActivity extends AppCompatActivity {
                 Intent settingsIntent = new Intent(this, SettingsActivity.class);
                 startActivity(settingsIntent);
                 return true;
+            case R.id.action_stop_service:
+                stopService(new Intent(JBpmActivity.this, JBpmMusicService.class));
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -101,20 +100,31 @@ public class JBpmActivity extends AppCompatActivity {
 
     private void init() {
         this.musicProvider = new LocalMusicProvider(this);
-        this.mediaView.setCurrentSong(this.musicProvider.getNextSong(100));
+        BpmMappedSong newSong = this.musicProvider.getNextSong(100);
+        this.mediaView.setCurrentSong(newSong);
+        broadCastNewSong(newSong);
         this.mediaView.setMediaListener(new MediaListener() {
 
             @Override
             public void onSkip() {
                 musicProvider.dislike(null); // TODO: Get current song from music service
                 BpmMappedSong bpmMappedSong = musicProvider.getNextSong(100f); // TODO: Get current desired BPM From bpm service
+                broadCastNewSong(bpmMappedSong);
                 mediaView.setCurrentSong(bpmMappedSong);
                 infoView.setCurrentSong(bpmMappedSong);
             }
 
             @Override
             public void onPlayStatusChange(boolean isPlaying) {
-                startMusicService();
+                Intent broadcast = new Intent();
+                if(isPlaying)
+                {
+                    broadcast.setAction(BroadcastAction.PLAYBACK.PLAY.ACTION);
+                }
+                else {
+                    broadcast.setAction(BroadcastAction.PLAYBACK.PAUSE.ACTION);
+                }
+                sendBroadcast(broadcast);
             }
 
             @Override
@@ -122,5 +132,13 @@ public class JBpmActivity extends AppCompatActivity {
                 Toast.makeText(JBpmActivity.this, ""+progress, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void broadCastNewSong(BpmMappedSong newSong)
+    {
+        Intent broadcast = new Intent();
+        broadcast.setAction(BroadcastAction.FILE.NEXT_SONG.ACTION);
+        broadcast.putExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG, newSong);
+        sendBroadcast(broadcast);
     }
 }

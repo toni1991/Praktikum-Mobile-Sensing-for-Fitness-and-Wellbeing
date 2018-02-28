@@ -23,7 +23,7 @@ public class LocalMusicProvider extends MusicProvider {
 
         songCount++;
 
-        File audioFile = getRandomAudioFile();
+        String audioFile = getRandomAudioFile();
         bpm = getRandomBpm();
         String genre = getRandomGenre();
 
@@ -35,14 +35,19 @@ public class LocalMusicProvider extends MusicProvider {
         //Nothing to do here
     }
 
-    private File getRandomAudioFile() {
+    private String getRandomAudioFile() {
         File mediaDirectory = getMediaDirectory();
 
         File[] suitableFiles = mediaDirectory.listFiles(
                 (File directory, String fileName) -> fileName.endsWith(".mp3")
         );
 
-        return suitableFiles[songCount % suitableFiles.length];
+        if(suitableFiles != null && suitableFiles.length > 0) {
+            return suitableFiles[songCount % suitableFiles.length].getAbsolutePath();
+        }
+        else {
+            return "";
+        }
     }
 
     private float getRandomBpm() {

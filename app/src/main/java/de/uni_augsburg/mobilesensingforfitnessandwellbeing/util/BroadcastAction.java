@@ -30,5 +30,12 @@ public interface BroadcastAction {
             String ACTION = "de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.NEXT_SONG";
             String EXTRA_SONG = "song";
         }
+        interface REQUEST_CURRENT_SONG {
+            String ACTION = "de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.REQUEST_CURRENT_SONG";
+        }
+        interface CURRENT_SONG {
+            String ACTION = "de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.CURRENT_SONG";
+            String EXTRA_SONG = "song";
+        }
     }
 }

@@ -120,6 +120,7 @@ public class SettingsFragment extends PreferenceFragment  implements
         {
             case "pref_height": updateHeightPreference(preference); break;
             case "pref_sensors": updateSensorsPreference(preference); break;
+            case "pref_media_directory": updateMediaDirectoryPreference(preference); break;
         }
     }
 
