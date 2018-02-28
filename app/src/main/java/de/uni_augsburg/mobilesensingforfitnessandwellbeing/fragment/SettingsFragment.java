@@ -9,6 +9,7 @@ import android.preference.PreferenceScreen;
 
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.AccSensor;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.BTSensor;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.GpsSensor;
 
 public class SettingsFragment extends PreferenceFragment {
@@ -30,7 +31,8 @@ public class SettingsFragment extends PreferenceFragment {
 
         String[] sensorNames = new String[]{
                 new GpsSensor(preferenceScreen.getContext()).getSensorName(),
-                new AccSensor(preferenceScreen.getContext()).getSensorName()
+                new AccSensor(preferenceScreen.getContext()).getSensorName(),
+                new BTSensor(preferenceScreen.getContext()).getSensorName()
         };
 
         MultiSelectListPreference sensorListPreference = new MultiSelectListPreference(preferenceScreen.getContext());
