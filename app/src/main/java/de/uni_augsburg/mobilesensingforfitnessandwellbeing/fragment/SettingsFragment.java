@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.AccSensor;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.BTSensor;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.GpsSensor;
 
 public class SettingsFragment extends PreferenceFragment  implements
@@ -64,8 +65,7 @@ public class SettingsFragment extends PreferenceFragment  implements
         EditTextPreference mediaDirectoryPreference = new EditTextPreference(preferenceScreen.getContext());
         mediaDirectoryPreference.setKey("pref_media_directory");
         mediaDirectoryPreference.setTitle(getResources().getString(R.string.settings_media_directory));
-        mediaDirectoryPreference.getEditText().setInputType(InputType.TYPE_CLASS_NUMBER);
-        mediaDirectoryPreference.setDefaultValue( Environment.getExternalStorageDirectory() + "/media");
+        mediaDirectoryPreference.setDefaultValue( Environment.getExternalStorageDirectory() + "/Music");
 
         preferenceCategory.addPreference(mediaDirectoryPreference);
 
@@ -85,7 +85,8 @@ public class SettingsFragment extends PreferenceFragment  implements
 
         String[] sensorNames = new String[]{
                 new GpsSensor(preferenceScreen.getContext()).getSensorName(),
-                new AccSensor(preferenceScreen.getContext()).getSensorName()
+                new AccSensor(preferenceScreen.getContext()).getSensorName(),
+                new BTSensor(preferenceScreen.getContext()).getSensorName()
         };
 
         MultiSelectListPreference sensorListPreference = new MultiSelectListPreference(preferenceScreen.getContext());

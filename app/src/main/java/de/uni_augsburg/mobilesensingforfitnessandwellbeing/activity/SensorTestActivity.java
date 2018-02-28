@@ -7,6 +7,7 @@ import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.BTSensor;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -103,6 +104,12 @@ public class SensorTestActivity extends AppCompatActivity {
         if (activatedSensors.contains(accSensor.getSensorName())) {
             requestPermissions(accSensor.necessaryPermissions());
             sensors.put(accSensor.getSensorName(), accSensor);
+        }
+
+        Sensor btSensor = new BTSensor(this);
+        if(activatedSensors.contains(btSensor.getSensorName())) {
+            requestPermissions(btSensor.necessaryPermissions());
+            sensors.put(btSensor.getSensorName(), btSensor);
         }
     }
 

@@ -21,6 +21,8 @@ public class LocalMusicProvider extends MusicProvider {
     @Override
     public BpmMappedSong getNextSong(float bpm) {
 
+        songCount++;
+
         File audioFile = getRandomAudioFile();
         bpm = getRandomBpm();
         String genre = getRandomGenre();
@@ -47,7 +49,7 @@ public class LocalMusicProvider extends MusicProvider {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             return ThreadLocalRandom.current().nextInt(5000, 20000 + 1) / 100f;
         } else {
-            return 80 + songCount++;
+            return 80 + songCount;
         }
     }
 
