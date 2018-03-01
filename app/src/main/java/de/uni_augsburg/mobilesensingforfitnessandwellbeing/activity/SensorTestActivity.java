@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.GpsSensor;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.service.JBpmMusicService;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.service.SensorToMusic;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
 
@@ -150,6 +151,28 @@ public class SensorTestActivity extends AppCompatActivity {
         } else {
             logText.append("permission: " + "?" + " denied \n");
         }
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        registerBroadcastReceiver();
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        unregisterBroadcastReceivers();
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+    }
+
+    private void unregisterBroadcastReceivers() {
+        unregisterReceiver(this.broadcastReceiver);
     }
 
 
