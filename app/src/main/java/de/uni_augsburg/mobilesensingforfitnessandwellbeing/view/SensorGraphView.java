@@ -36,10 +36,10 @@ public class SensorGraphView
         //extends GraphView
 {
 
-    private ArrayList<String> sensorNames;
-    private HashMap<String, ArrayList<DataPoint>> sensorMap;
-    private ArrayList<LineGraphSeries<DataPoint>> mSeries;
-    private HashMap<String, LineGraphSeries<DataPoint>> seriesMap;
+    private ArrayList<String> sensorNames = new ArrayList<>();
+    private HashMap<String, ArrayList<DataPoint>> sensorMap = new HashMap<>();
+    private ArrayList<LineGraphSeries<DataPoint>> mSeries = new ArrayList<>();
+    private HashMap<String, LineGraphSeries<DataPoint>> seriesMap = new HashMap<>();
     private GraphView graph;
 
     private Runnable mTimer;
@@ -61,6 +61,7 @@ public class SensorGraphView
         LineGraphSeries<DataPoint> newSeries = new LineGraphSeries<>();
         this.graph.addSeries(newSeries);
         this.seriesMap.put(newSensor, newSeries);
+        this.mSeries.add(newSeries);
     }
 
     private void pushNewDataPoint(String sensor, DataPoint newPoint)
@@ -193,7 +194,7 @@ public class SensorGraphView
             @Override
             public void run()
             {
-                if (seriesMap.keySet().isEmpty())
+                if (!seriesMap.keySet().isEmpty())
                 {
                     seriesMap.keySet().forEach(s -> {
                         seriesMap.get(s).appendData(new DataPoint(getLatestPoint(s).getX(), getLatestPoint(s).getY()),

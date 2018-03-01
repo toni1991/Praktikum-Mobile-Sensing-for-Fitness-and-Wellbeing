@@ -14,8 +14,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
 
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.BpmMappedSong;
@@ -38,6 +36,7 @@ public class MediaView extends ConstraintLayout {
     private BpmMappedSong currentSong;
 
     private boolean isPlaying = false;
+    private boolean currentlySeeking = false;
     private MediaListener mediaListener;
 
     public MediaView(Context context) {
@@ -69,21 +68,27 @@ public class MediaView extends ConstraintLayout {
 
     private void initMediaPlayPauseButtonListener() {
         this.mediaPlayPauseButton.setOnClickListener((View v) -> {
-            if (isPlaying) {
-                pausePlaying();
-            } else {
-                startPlaying();
-            }
-            isPlaying = !isPlaying;
-            this.mediaListener.onPlayStatusChange(isPlaying);
+            this.mediaListener.onPlayStatusChange(!isPlaying);
         });
     }
 
-    private void pausePlaying() {
+    private void setPlaybackImage(boolean isPlaying)
+    {
+        this.isPlaying = isPlaying;
+        if(isPlaying)
+        {
+            setPlayIcon();
+        }
+        else {
+            setPauseIcon();
+        }
+    }
+
+    private void setPauseIcon() {
         mediaPlayPauseButton.setImageResource(android.R.drawable.ic_media_pause);
     }
 
-    private void startPlaying() {
+    private void setPlayIcon() {
         mediaPlayPauseButton.setImageResource(android.R.drawable.ic_media_play);
     }
 
@@ -109,12 +114,13 @@ public class MediaView extends ConstraintLayout {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                currentlySeeking = true;
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 mediaListener.onSeekbarProgressChange(seekBar.getProgress());
+                currentlySeeking = false;
             }
         });
     }
@@ -184,15 +190,20 @@ public class MediaView extends ConstraintLayout {
 
             Log.d("BroadcastReceiver MediaView", "Action: " + intent.getAction());
 
-            switch (intent.getAction()) {
-                case BroadcastAction.PLAYBACK.PROGRESS.ACTION:
+            String s = intent.getAction();
+            if (s.equals(BroadcastAction.PLAYBACK.PROGRESS.ACTION)) {
+                if(!currentlySeeking) {
                     int progress = intent.getIntExtra(BroadcastAction.PLAYBACK.PROGRESS.EXTRA_PROGRESS, 0);
                     setMediaCurrentTime(progress);
-                    break;
-                case BroadcastAction.FILE.NEXT_SONG.ACTION:
-                    BpmMappedSong nextSong = intent.getParcelableExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG);
-                    setCurrentSong(nextSong);
-                    break;
+                }
+
+            } else if (s.equals(BroadcastAction.FILE.NEXT_SONG.ACTION)) {
+                BpmMappedSong nextSong = intent.getParcelableExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG);
+                setCurrentSong(nextSong);
+
+            } else if (s.equals(BroadcastAction.PLAYBACK.PLAYBACK_TOGGLED.ACTION)) {
+                boolean isPlaying = intent.getBooleanExtra(BroadcastAction.PLAYBACK.PLAYBACK_TOGGLED.EXTRA_ISPLAYING, false);
+                setPlaybackImage(isPlaying);
             }
         }
     };
@@ -206,6 +217,7 @@ public class MediaView extends ConstraintLayout {
     {
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.PLAYBACK.PROGRESS.ACTION);
+        filter.addAction(BroadcastAction.PLAYBACK.PLAYBACK_TOGGLED.ACTION);
         filter.addAction(BroadcastAction.FILE.NEXT_SONG.ACTION);
         return filter;
     }
