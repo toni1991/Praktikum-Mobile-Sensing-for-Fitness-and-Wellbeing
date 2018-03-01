@@ -60,13 +60,13 @@ public class AccSensor extends Sensor implements SensorEventListener {
 
             if (timeOfEvents.size() >= windowLength) {
                 if (timeOfEvents.size() != rEvents.size())
-                    throw new IllegalArgumentException("holy shit");
+                    throw new IllegalArgumentException("illegal argument exception AccSensor");
 
                 lastEnergy.add(DSPUitility.calculateShortTermEnergy(rEvents,rEvents.size()-windowLength, windowLength));
 
                 if (lastEnergy.size() == 3) {
 
-                    if (lastEnergy.get(2) > 6) {
+                    if (lastEnergy.get(2) > 12) {
                         Double preLastDerivation = lastEnergy.get(1) - lastEnergy.get(0);
                         double lastDerivation = lastEnergy.get(2) - lastEnergy.get(1);
                        // Log.d("test", preLastDerivation.toString() + " " + newValue);
