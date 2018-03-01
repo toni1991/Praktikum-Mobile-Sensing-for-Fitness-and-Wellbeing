@@ -40,7 +40,7 @@ public class JBpmMusicService extends Service {
             String s = intent.getAction();
             if (s.equals(BroadcastAction.PLAYBACK.PLAY.ACTION)) {
                 if (currentSong == null) {
-                    broadcastRequestNextSong();
+                    broadcastRequestNextSong(false);
                 } else {
                     playSongIfPossible();
                 }
@@ -155,7 +155,7 @@ public class JBpmMusicService extends Service {
     private void setMediaPlayerListeners() {
         mediaPlayer.setOnPreparedListener((MediaPlayer mp) -> playSongIfPossible());
         mediaPlayer.setOnCompletionListener((MediaPlayer mp) -> {
-            broadcastRequestNextSong();
+            broadcastRequestNextSong(false);
             pauseIfNotNullAndPlaying();
         });
     }
@@ -224,9 +224,10 @@ public class JBpmMusicService extends Service {
         return null;
     }
 
-    private void broadcastRequestNextSong() {
+    private void broadcastRequestNextSong(boolean dislike) {
         Intent broadcast = new Intent();
         broadcast.setAction(BroadcastAction.FILE.REQUEST_NEXT_SONG.ACTION);
+        broadcast.putExtra(BroadcastAction.FILE.REQUEST_NEXT_SONG.EXTRA_DISLIKE, dislike);
         sendBroadcast(broadcast);
     }
 
