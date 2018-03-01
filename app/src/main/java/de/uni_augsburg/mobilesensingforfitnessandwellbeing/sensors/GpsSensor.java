@@ -56,7 +56,7 @@ public class GpsSensor extends Sensor implements LocationListener {
         }
         this.locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER,
-                200L,
+                1000L,
                 1f,
                 this);
     }
