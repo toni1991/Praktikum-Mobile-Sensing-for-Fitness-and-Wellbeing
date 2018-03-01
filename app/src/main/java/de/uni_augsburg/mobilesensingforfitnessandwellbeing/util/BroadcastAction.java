@@ -6,10 +6,6 @@ package de.uni_augsburg.mobilesensingforfitnessandwellbeing.util;
 
 public interface BroadcastAction {
     interface PLAYBACK {
-        interface SKIP {
-            String ACTION = "de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.NEXT";
-            String EXTRA_SONG = "song";
-        }
         interface PLAY {
             String ACTION = "de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.PLAY";
         }
@@ -24,21 +20,19 @@ public interface BroadcastAction {
             String ACTION = "de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.SET_PROGRESS";
             String EXTRA_PROGRESS = "progress";
         }
+        interface PLAYBACK_TOGGLED {
+            String ACTION = "de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.PLAYBACK_TOGGLED";
+            String EXTRA_ISPLAYING = "isPlaying";
+        }
     }
 
     interface FILE {
         interface REQUEST_NEXT_SONG {
             String ACTION = "de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.REQUEST_NEXT_SONG";
+            String EXTRA_DISLIKE = "dislike";
         }
         interface NEXT_SONG {
             String ACTION = "de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.NEXT_SONG";
-            String EXTRA_SONG = "song";
-        }
-        interface REQUEST_CURRENT_SONG {
-            String ACTION = "de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.REQUEST_CURRENT_SONG";
-        }
-        interface CURRENT_SONG {
-            String ACTION = "de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.CURRENT_SONG";
             String EXTRA_SONG = "song";
         }
     }

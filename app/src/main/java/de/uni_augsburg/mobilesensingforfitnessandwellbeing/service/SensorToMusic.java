@@ -16,6 +16,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -24,6 +25,8 @@ import java.util.LinkedList;
 
 import android.os.CountDownTimer;
 
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.musicLibrary.MusicTrack;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.musicLibrary.TrackFinder;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.AccSensor;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.BTSensor;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.GpsSensor;
@@ -43,6 +46,8 @@ public class SensorToMusic extends Service {
     private long lastChangedSong; // mills
     private long minSongDuration; // mills
 
+    private TrackFinder trackFinder;
+
     float lastBPMEstimation = 0.0f;
     float bpmSongChangeThreshold;
 
@@ -54,6 +59,9 @@ public class SensorToMusic extends Service {
 
     @Override
     public void onCreate() {
+
+        trackFinder = new TrackFinder(this.getApplicationContext());
+
         windowLength = 1500;
         minSongDuration = 10 * 1000; // 10 sec
         bpmSongChangeThreshold = 25;
@@ -169,13 +177,28 @@ public class SensorToMusic extends Service {
         if (Math.abs(bpmEstimation - lastBPMEstimation) > bpmSongChangeThreshold)
         {
             lastChangedSong = System.currentTimeMillis();
-            broadcastNewSong(bpmEstimation);
+            broadcastNewSong(bpmEstimation, false);
         }
     }
 
-    private void broadcastNewSong(float estimation)
+    private void broadcastNewSong(float estimation, boolean dislike)
     {
-        //
+
+        MusicTrack track;
+        File mp3 = null;
+
+        //that's how to receive a track object
+        track = trackFinder.getNextSong(estimation);
+        mp3 = track.getAudioFile();
+
+        //that's how to dislike a track
+        if(dislike) {
+            trackFinder.dislike(track);
+        }
+
+
+        //TODO: brodcast audiofile/audio object
+
     }
 
     private void broadCastSensorValue(String sensor_name, String value_name, Double value)
