@@ -75,7 +75,7 @@ public class SensorGraphView
     public void pushNewData(String sensor, double value)
     {
         Log.e("graphView", "starting push");
-        double timeDiff = (double) (System.currentTimeMillis() - this.startTime);
+        double timeDiff = (double) ( (System.currentTimeMillis() - this.startTime) / 1000);
         DataPoint newData = new DataPoint(timeDiff, value);
         this.pushNewDataPoint(sensor, newData);
     }
