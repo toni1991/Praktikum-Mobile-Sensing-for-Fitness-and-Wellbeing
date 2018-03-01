@@ -43,7 +43,7 @@ public class GpsSensor extends Sensor implements LocationListener {
     }
 
     public static String[] necessaryPermissions() {
-        return new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+        return new String[]{ Manifest.permission.ACCESS_FINE_LOCATION};
     }
 
     private void registerLocationListener() {

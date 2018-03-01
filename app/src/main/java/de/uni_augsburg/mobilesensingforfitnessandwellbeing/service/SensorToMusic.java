@@ -40,6 +40,12 @@ public class SensorToMusic extends Service {
     private LinkedList<Long> Times;
     private long windowLength;
 
+    private long lastChangedSong; // mills
+    private long minSongDuration; // mills
+
+    float lastBPMEstimation = 0.0f;
+    float bpmSongChangeThreshold;
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -49,14 +55,25 @@ public class SensorToMusic extends Service {
     @Override
     public void onCreate() {
         windowLength = 1500;
+        minSongDuration = 10 * 1000; // 10 sec
+        bpmSongChangeThreshold = 25;
         this.BPMs = new LinkedList<>();
         this.Times = new LinkedList<>();
         this.broadcastReceiver = new BroadcastReceiver() {
 
-        @Override
-        public void onReceive(Context context, Intent intent) {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                switch (intent.getAction()) {
+                    case BroadcastAction.FILE.REQUEST_NEXT_SONG.ACTION:
+                    {
+                        lastChangedSong = System.currentTimeMillis();
+                        // reply
+                        // NEXT SONG
+                    }
+                    break;
 
-            }
+                }
+                }
         };
         registerBroadcastReceiver();
 
@@ -92,9 +109,11 @@ public class SensorToMusic extends Service {
                 long time = System.currentTimeMillis();
                 sensors.forEach((name,sensor)-> broadCastSensor(sensor));
                 sensors.forEach((name,sensor)-> addBPMEstimation(sensor,time) );
+                float estimation = BPMEstimation();
+
                 deleteOldEstimations(time);
-                broadCastBPMEstimation();
-                decisionNewSong(time);
+                broadCastBPMEstimation(estimation);
+                decisionNewSong(time, estimation);
             }
 
             public void onFinish() {
@@ -121,7 +140,7 @@ public class SensorToMusic extends Service {
         }
     }
 
-    private void broadCastBPMEstimation()
+    private float BPMEstimation()
     {
         float estimation = 0.0f;
         for (float bpm : BPMs)
@@ -129,6 +148,11 @@ public class SensorToMusic extends Service {
             estimation += bpm;
         }
         estimation /= BPMs.size();
+        return estimation;
+    }
+
+    private void broadCastBPMEstimation(float estimation)
+    {
 
         Intent broadcast = new Intent();
         broadcast.setAction(BroadcastAction.VALUES.BPMESTIMATION.ACTION);
@@ -137,9 +161,21 @@ public class SensorToMusic extends Service {
 
     }
 
-    private void decisionNewSong(long time)
+    private void decisionNewSong(long time, float bpmEstimation)
     {
+        if (!(lastChangedSong + this.minSongDuration > time))
+            return;
 
+        if (Math.abs(bpmEstimation - lastBPMEstimation) > bpmSongChangeThreshold)
+        {
+            lastChangedSong = System.currentTimeMillis();
+            broadcastNewSong(bpmEstimation);
+        }
+    }
+
+    private void broadcastNewSong(float estimation)
+    {
+        //
     }
 
     private void broadCastSensorValue(String sensor_name, String value_name, Double value)
