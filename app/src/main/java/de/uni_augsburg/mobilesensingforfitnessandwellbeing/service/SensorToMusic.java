@@ -192,19 +192,16 @@ public class SensorToMusic extends Service {
     private void broadcastNewSong(float estimation, boolean dislike)
     {
 
-        MusicTrack track;
+        MusicTrack track = trackFinder.getNextSong(estimation);
 
-        //that's how to receive a track object
-        track = trackFinder.getNextSong(estimation);
-
-        //that's how to dislike a track
         if(dislike) {
             trackFinder.dislike(track);
         }
 
-
-        //TODO: brodcast audiofile/audio object
-
+        Intent broadcast = new Intent();
+        broadcast.setAction(BroadcastAction.FILE.NEXT_SONG.ACTION);
+        broadcast.putExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG , track);
+        sendBroadcast(broadcast);
     }
 
     private void broadCastSensorValue(String sensor_name, String value_name, Double value)
