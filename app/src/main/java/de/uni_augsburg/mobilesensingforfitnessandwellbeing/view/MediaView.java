@@ -37,6 +37,27 @@ public class MediaView extends ConstraintLayout {
     private boolean isPlaying = false;
     private boolean currentlySeeking = false;
     private MediaListener mediaListener;
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String action = intent.getAction();
+            if (action.equals(BroadcastAction.PLAYBACK.PROGRESS.ACTION)) {
+                if (!currentlySeeking) {
+                    int progress = intent.getIntExtra(BroadcastAction.PLAYBACK.PROGRESS.EXTRA_PROGRESS, 0);
+                    setMediaCurrentTime(progress);
+                }
+
+            } else if (action.equals(BroadcastAction.FILE.NEXT_SONG.ACTION)) {
+                MusicTrack nextSong = intent.getParcelableExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG);
+                setCurrentSong(nextSong);
+
+            } else if (action.equals(BroadcastAction.PLAYBACK.PLAYBACK_TOGGLED.ACTION)) {
+                boolean isPlaying = intent.getBooleanExtra(BroadcastAction.PLAYBACK.PLAYBACK_TOGGLED.EXTRA_ISPLAYING, false);
+                setPlaybackImage(!isPlaying);
+            }
+        }
+    };
 
     public MediaView(Context context) {
         super(context);
@@ -67,18 +88,15 @@ public class MediaView extends ConstraintLayout {
 
     private void initMediaPlayPauseButtonListener() {
         this.mediaPlayPauseButton.setOnClickListener((View v) -> {
-            this.mediaListener.onPlayStatusChange(!isPlaying);
+            this.mediaListener.onPlayStatusChange(isPlaying);
         });
     }
 
-    private void setPlaybackImage(boolean isPlaying)
-    {
+    private void setPlaybackImage(boolean isPlaying) {
         this.isPlaying = isPlaying;
-        if(isPlaying)
-        {
+        if (isPlaying) {
             setPlayIcon();
-        }
-        else {
+        } else {
             setPauseIcon();
         }
     }
@@ -148,7 +166,7 @@ public class MediaView extends ConstraintLayout {
     }
 
     public void setCurrentSong(MusicTrack currentSong) {
-        if(new File(currentSong.getPath()).isFile()) {
+        if (new File(currentSong.getPath()).isFile()) {
             this.currentSong = currentSong;
             setMediaTitleOfCurrentSong();
             setMediaTotalTimeOfCurrentSong();
@@ -166,7 +184,7 @@ public class MediaView extends ConstraintLayout {
         String artist = mmR.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
         String title = mmR.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
 
-        String artistAndMaybeTitle = artist + (title.isEmpty() ? "" :  " - "+title);
+        String artistAndMaybeTitle = artist + (title.isEmpty() ? "" : " - " + title);
 
         setMediaTitle(artistAndMaybeTitle.isEmpty() ? audioFile.getName() : artistAndMaybeTitle);
     }
@@ -183,35 +201,11 @@ public class MediaView extends ConstraintLayout {
         this.mediaTitleTextView.setText(mediaTitle);
     }
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            String s = intent.getAction();
-            if (s.equals(BroadcastAction.PLAYBACK.PROGRESS.ACTION)) {
-                if(!currentlySeeking) {
-                    int progress = intent.getIntExtra(BroadcastAction.PLAYBACK.PROGRESS.EXTRA_PROGRESS, 0);
-                    setMediaCurrentTime(progress);
-                }
-
-            } else if (s.equals(BroadcastAction.FILE.NEXT_SONG.ACTION)) {
-                MusicTrack nextSong = intent.getParcelableExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG);
-                setCurrentSong(nextSong);
-
-            } else if (s.equals(BroadcastAction.PLAYBACK.PLAYBACK_TOGGLED.ACTION)) {
-                boolean isPlaying = intent.getBooleanExtra(BroadcastAction.PLAYBACK.PLAYBACK_TOGGLED.EXTRA_ISPLAYING, false);
-                setPlaybackImage(isPlaying);
-            }
-        }
-    };
-
-    public BroadcastReceiver getBroadcastReceiver()
-    {
+    public BroadcastReceiver getBroadcastReceiver() {
         return this.broadcastReceiver;
     }
 
-    public IntentFilter getIntentFilter()
-    {
+    public IntentFilter getIntentFilter() {
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.PLAYBACK.PROGRESS.ACTION);
         filter.addAction(BroadcastAction.PLAYBACK.PLAYBACK_TOGGLED.ACTION);
