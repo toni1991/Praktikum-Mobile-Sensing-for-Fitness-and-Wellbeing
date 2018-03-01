@@ -23,7 +23,6 @@ import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
 public class TrackFinder {
 
     private Context appContext;
-    private Activity activity;
     private final File trackDirectory = new File(Environment.getExternalStorageDirectory() + "/PraktikumMobileSensing/music/");
     private ArrayList<MusicTrack> tracks = new ArrayList<>();
     private float minBPM;
@@ -33,7 +32,6 @@ public class TrackFinder {
 
     public TrackFinder(Context appContext) {
         this.appContext = appContext;
-        this.activity = (Activity) this.appContext;
         minBPM = Float.MAX_VALUE;
         maxBPM = Float.MIN_VALUE;
         loadTrackInformation();
