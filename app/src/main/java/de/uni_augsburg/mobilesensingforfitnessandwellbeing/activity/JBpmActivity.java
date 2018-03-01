@@ -27,11 +27,6 @@ import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.view.InfoView;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.view.MediaView;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.view.SensorGraphView;
-import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
-import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.GpsSensor;
-import de.uni_augsburg.mobilesensingforfitnessandwellbeing.service.JBpmMusicService;
-import de.uni_augsburg.mobilesensingforfitnessandwellbeing.service.SensorToMusic;
-import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
 
 public class JBpmActivity extends AppCompatActivity {
 
@@ -40,6 +35,8 @@ public class JBpmActivity extends AppCompatActivity {
     private SensorGraphView sensorGraphView;
     private GraphView graphView;
     private MusicProvider musicProvider;
+    // Sensor Service
+    private ArrayList<String> allPermissions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,11 +83,6 @@ public class JBpmActivity extends AppCompatActivity {
         this.sensorGraphView.unregisterBroadcastReceiver(this);
     }
 
-    private void startMusicService() {
-        Intent musicService = new Intent(this, JBpmMusicService.class);
-        startService(musicService);
-    }
-
     /*
     private void requestPermissions(String[] permissions) {
         for (String permission : permissions) {
@@ -102,6 +94,11 @@ public class JBpmActivity extends AppCompatActivity {
             }
         }
     }*/
+
+    private void startMusicService() {
+        Intent musicService = new Intent(this, JBpmMusicService.class);
+        startService(musicService);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -190,31 +187,25 @@ public class JBpmActivity extends AppCompatActivity {
         sendBroadcast(broadcast);
     }
 
-    // Sensor Service
-    private ArrayList<String> allPermissions;
-
     private void startSensorService() {
-        Intent i =new Intent(getApplicationContext(),SensorToMusic.class);
+        Intent i = new Intent(getApplicationContext(), SensorToMusic.class);
         startService(i);
     }
 
     private void initSensors() {
         this.allPermissions = new ArrayList<>();
         boolean request1 = requestPermissions(BTSensor.necessaryPermissions());
-        boolean request2 = requestPermissions(GpsSensor.necessaryPermissions()) ;
-        if (request1 && request2)
-        {
+        boolean request2 = requestPermissions(GpsSensor.necessaryPermissions());
+        if (request1 && request2) {
             startSensorService();
         }
     }
 
-    private boolean requestPermissions(String[] permissions)
-    {
+    private boolean requestPermissions(String[] permissions) {
         boolean allPermissionsGranted = true;
         for (String permission : permissions) {
             if (ActivityCompat.checkSelfPermission(this, permission) !=
-                    PackageManager.PERMISSION_GRANTED)
-            {
+                    PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this,
                         new String[]{permission},
                         0);
@@ -222,7 +213,7 @@ public class JBpmActivity extends AppCompatActivity {
                 allPermissionsGranted = false;
 
             }
-         }
+        }
         return allPermissionsGranted;
     }
 

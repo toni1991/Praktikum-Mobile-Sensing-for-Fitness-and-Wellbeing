@@ -47,6 +47,19 @@ public class TrackFinder extends MusicProvider{
         SongQueue loPrio = getSuitableQueue(bpm, this.loPrioQueues);
         double random = Math.random();
 
+        if(hiPrio == null && loPrio != null && loPrio.size() > 0)
+        {
+            return loPrio.poll();
+        }
+        else if(loPrio == null && hiPrio != null && hiPrio.size() > 0)
+        {
+            return hiPrio.poll();
+        }
+        else if((loPrio == null || loPrio.size() == 0) && (hiPrio == null || loPrio.size() == 0))
+        {
+            return new MusicTrack();
+        }
+
         //If less than n songs are left in high priority queue and low priority queue is not empty poll song from low priority queue with prob. 1/n-1
         if((hiPrio.size() < n && loPrio.size() > 0 && random <= 1/(n-1)) || (hiPrio.size() == 0)) {
             retval = loPrio.poll();
@@ -157,7 +170,9 @@ public class TrackFinder extends MusicProvider{
                 }
                 oldDiff = diff;
             }
-            retval = queueSet.get(index);
+            if(index <= queueSet.size()) {
+                retval = queueSet.get(index);
+            }
         }
 
         return retval;
