@@ -3,30 +3,75 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:layout_editor_absoluteY="81dp">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/bpmTextView"
+    <android.support.constraint.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="120"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <TextView
-        android:id="@+id/bpmLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="BPM"
-        app:layout_constraintBaseline_toBaselineOf="@+id/bpmTextView"
-        app:layout_constraintStart_toEndOf="@+id/bpmTextView" />
+        <TextView
+            android:id="@+id/bpmTextViewCurrentSong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="120"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.304" />
+
+        <TextView
+            android:id="@+id/labelEstimated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Estimated"
+            app:layout_constraintBaseline_toBaselineOf="@+id/bpmTextViewEstimated"
+            app:layout_constraintEnd_toStartOf="@+id/bpmTextViewEstimated" />
+
+        <TextView
+            android:id="@+id/labelCurrentSong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Current song"
+            app:layout_constraintBaseline_toBaselineOf="@+id/bpmTextViewCurrentSong"
+            app:layout_constraintEnd_toStartOf="@+id/bpmTextViewCurrentSong" />
+
+        <TextView
+            android:id="@+id/labelCurrentSongBpm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="BPM"
+            app:layout_constraintBaseline_toBaselineOf="@+id/bpmTextViewCurrentSong"
+            app:layout_constraintStart_toEndOf="@+id/bpmTextViewCurrentSong" />
+
+        <TextView
+            android:id="@+id/bpmTextViewEstimated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="117,98"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/bpmTextViewCurrentSong"
+            app:layout_constraintVertical_bias="0.111" />
+
+        <TextView
+            android:id="@+id/labelEstimatedBpm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="BPM"
+            app:layout_constraintBaseline_toBaselineOf="@+id/bpmTextViewEstimated"
+            app:layout_constraintStart_toEndOf="@+id/bpmTextViewEstimated" />
+    </android.support.constraint.ConstraintLayout>
 </android.support.constraint.ConstraintLayout>

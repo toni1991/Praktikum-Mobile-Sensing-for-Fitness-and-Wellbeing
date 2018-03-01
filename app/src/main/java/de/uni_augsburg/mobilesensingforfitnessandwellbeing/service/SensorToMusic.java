@@ -65,6 +65,8 @@ public class SensorToMusic extends Service {
         windowLength = 1500;
         minSongDuration = 10 * 1000; // 10 sec
         bpmSongChangeThreshold = 25;
+        lastChangedSong = 0;
+
         this.BPMs = new LinkedList<>();
         this.Times = new LinkedList<>();
         this.broadcastReceiver = new BroadcastReceiver() {
@@ -79,12 +81,10 @@ public class SensorToMusic extends Service {
 
                         if (lastBPMEstimation < 0.0f)
                         {
-
-                            // there is no value yet
-                            
+                            broadcastNewSong(75, false);
                         }
 
-                        // NEXT SONG
+                        broadcastNewSong(BPMEstimation(), dislike);
                     }
                     break;
 
@@ -192,19 +192,16 @@ public class SensorToMusic extends Service {
     private void broadcastNewSong(float estimation, boolean dislike)
     {
 
-        MusicTrack track;
+        MusicTrack track = trackFinder.getNextSong(estimation);
 
-        //that's how to receive a track object
-        track = trackFinder.getNextSong(estimation);
-
-        //that's how to dislike a track
         if(dislike) {
             trackFinder.dislike(track);
         }
 
-
-        //TODO: brodcast audiofile/audio object
-
+        Intent broadcast = new Intent();
+        broadcast.setAction(BroadcastAction.FILE.NEXT_SONG.ACTION);
+        broadcast.putExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG , track);
+        sendBroadcast(broadcast);
     }
 
     private void broadCastSensorValue(String sensor_name, String value_name, Double value)
@@ -233,8 +230,12 @@ public class SensorToMusic extends Service {
 
     private void registerBroadcastReceiver() {
         IntentFilter filter = new IntentFilter();
-        filter.addAction(BroadcastAction.FILE.NEXT_SONG.ACTION);
+        filter.addAction(BroadcastAction.FILE.REQUEST_NEXT_SONG.ACTION);
         registerReceiver(this.broadcastReceiver, filter);
+    }
+
+    private void unregisterBroadcastReciever() {
+        unregisterReceiver(this.broadcastReceiver);
     }
 
 }

@@ -12,11 +12,15 @@ import android.view.MenuItem;
 
 import com.jjoe64.graphview.GraphView;
 
+import java.util.ArrayList;
+
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.LocalMusicProvider;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MediaListener;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MusicProvider;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.musicLibrary.MusicTrack;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.BTSensor;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.GpsSensor;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.service.JBpmMusicService;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.service.SensorToMusic;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
@@ -31,18 +35,27 @@ public class JBpmActivity extends AppCompatActivity {
     private SensorGraphView sensorGraphView;
     private GraphView graphView;
     private MusicProvider musicProvider;
+    // Sensor Service
+    private ArrayList<String> allPermissions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_j_bpm);
+
+        this.allPermissions = new ArrayList<>();
+
+
         requestPermissions(new String[]{
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE}
         );
+
+
         findViews();
         startMusicService();
         init();
+        initSensors();
     }
 
     @Override
@@ -65,20 +78,18 @@ public class JBpmActivity extends AppCompatActivity {
     }
 
     private void registerBroadcastReceivers() {
+        registerReceiver(infoView.getBroadcastReceiver(), infoView.getIntentFilter());
         registerReceiver(mediaView.getBroadcastReceiver(), mediaView.getIntentFilter());
         this.sensorGraphView.registerBroadcastReceiver(this);
     }
 
     private void unregisterBroadcastReceivers() {
+        unregisterReceiver(infoView.getBroadcastReceiver());
         unregisterReceiver(mediaView.getBroadcastReceiver());
         this.sensorGraphView.unregisterBroadcastReceiver(this);
     }
 
-    private void startMusicService() {
-        Intent musicService = new Intent(this, JBpmMusicService.class);
-        startService(musicService);
-    }
-
+    /*
     private void requestPermissions(String[] permissions) {
         for (String permission : permissions) {
             if (ActivityCompat.checkSelfPermission(this, permission) !=
@@ -88,6 +99,11 @@ public class JBpmActivity extends AppCompatActivity {
                         0);
             }
         }
+    }*/
+
+    private void startMusicService() {
+        Intent musicService = new Intent(this, JBpmMusicService.class);
+        startService(musicService);
     }
 
     @Override
@@ -175,5 +191,60 @@ public class JBpmActivity extends AppCompatActivity {
         broadcast.setAction(BroadcastAction.FILE.NEXT_SONG.ACTION);
         broadcast.putExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG, newSong);
         sendBroadcast(broadcast);
+    }
+
+    private void startSensorService() {
+        Intent i = new Intent(getApplicationContext(), SensorToMusic.class);
+        startService(i);
+    }
+
+    private void initSensors() {
+        boolean request1 = requestPermissions(BTSensor.necessaryPermissions());
+        boolean request2 = requestPermissions(GpsSensor.necessaryPermissions());
+        if (request1 && request2) {
+            startSensorService();
+        }
+    }
+
+    private boolean requestPermissions(String[] permissions) {
+        boolean allPermissionsGranted = true;
+        for (String permission : permissions) {
+            if (ActivityCompat.checkSelfPermission(this, permission) !=
+                    PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{permission},
+                        0);
+                allPermissions.add(permission);
+                allPermissionsGranted = false;
+
+            }
+        }
+        return allPermissionsGranted;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+
+        // If request is cancelled, the result arrays are empty.
+        if (grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+            if (checkPermissions())
+                startSensorService();
+
+        }
+    }
+
+    private boolean checkPermissions() {
+        boolean allPermissionsGranted = true;
+
+        for (String permission : allPermissions) {
+            if (ActivityCompat.checkSelfPermission(this, permission) !=
+                    PackageManager.PERMISSION_GRANTED) {
+                allPermissionsGranted = false;
+            }
+        }
+        return allPermissionsGranted;
     }
 }
