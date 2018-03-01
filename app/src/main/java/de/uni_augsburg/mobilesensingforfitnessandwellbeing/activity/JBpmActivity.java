@@ -18,6 +18,7 @@ import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MediaListener;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MusicProvider;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.musicLibrary.MusicTrack;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.service.JBpmMusicService;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.service.SensorToMusic;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.view.InfoView;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.view.MediaView;
@@ -60,6 +61,7 @@ public class JBpmActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         stopService(new Intent(JBpmActivity.this, JBpmMusicService.class));
+        stopService(new Intent(JBpmActivity.this, SensorToMusic.class));
     }
 
     private void registerBroadcastReceivers() {

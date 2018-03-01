@@ -48,7 +48,7 @@ public class SensorToMusic extends Service {
 
     private TrackFinder trackFinder;
 
-    float lastBPMEstimation = 0.0f;
+    float lastBPMEstimation = -100.0f;
     float bpmSongChangeThreshold;
 
     @Nullable
@@ -75,7 +75,15 @@ public class SensorToMusic extends Service {
                     case BroadcastAction.FILE.REQUEST_NEXT_SONG.ACTION:
                     {
                         lastChangedSong = System.currentTimeMillis();
-                        // reply
+                        boolean dislike =  intent.getBooleanExtra(BroadcastAction.FILE.REQUEST_NEXT_SONG.EXTRA_DISLIKE, false);
+
+                        if (lastBPMEstimation < 0.0f)
+                        {
+
+                            // there is no value yet
+                            
+                        }
+
                         // NEXT SONG
                     }
                     break;
