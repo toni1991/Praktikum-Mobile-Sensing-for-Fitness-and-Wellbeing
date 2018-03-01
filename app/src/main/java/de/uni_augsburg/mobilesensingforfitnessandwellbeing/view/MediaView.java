@@ -165,9 +165,10 @@ public class MediaView extends ConstraintLayout {
         timeTextView.setText(minutes + ":" + String.format("%02d", seconds));
     }
 
-    public void setCurrentSong(MusicTrack currentSong) {
-        if (new File(currentSong.getPath()).isFile()) {
-            this.currentSong = currentSong;
+    public void setCurrentSong(MusicTrack nextTrack) {
+
+        if(new File(nextTrack.getPath()).isFile() && (currentSong == null || !nextTrack.getPath().equals(currentSong.getPath()))) {
+            currentSong = nextTrack;
             setMediaTitleOfCurrentSong();
             setMediaTotalTimeOfCurrentSong();
             setMediaCurrentTime(0); // Time after song change is always 0

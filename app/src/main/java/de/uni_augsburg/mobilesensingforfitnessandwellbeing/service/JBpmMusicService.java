@@ -15,7 +15,6 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +29,7 @@ public class JBpmMusicService extends Service {
     private MediaPlayer mediaPlayer = null;
     private MusicTrack currentSong;
     private CountDownTimer countdownTimer;
+    private boolean shouldPlay = false;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -39,22 +39,27 @@ public class JBpmMusicService extends Service {
 
             String s = intent.getAction();
             if (s.equals(BroadcastAction.PLAYBACK.PLAY.ACTION)) {
+                shouldPlay = true;
                 if (currentSong == null) {
                     broadcastRequestNextSong(false);
                 } else {
                     playSongIfPossible();
                 }
             } else if (s.equals(BroadcastAction.PLAYBACK.PAUSE.ACTION)) {
+                shouldPlay = false;
                 pauseIfNotNullAndPlaying();
                 stopCountdownTimerIfRunning();
             } else if (s.equals(BroadcastAction.PLAYBACK.SET_PROGRESS.ACTION)) {
                 int progress = intent.getIntExtra(BroadcastAction.PLAYBACK.SET_PROGRESS.EXTRA_PROGRESS, 0);
                 setMediaProgress(progress);
             } else if (s.equals(BroadcastAction.FILE.NEXT_SONG.ACTION)) {
-                stopCountdownTimerIfRunning();
-                currentSong = intent.getParcelableExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG);
-                prepareMediaPlayer();
-                showNotification();
+                MusicTrack nextTrack = intent.getParcelableExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG);
+                if(currentSong == null || !nextTrack.getPath().equals(currentSong.getPath())) {
+                    currentSong = nextTrack;
+                    prepareMediaPlayer();
+                    stopCountdownTimerIfRunning();
+                    showNotification();
+                }
             }
         }
     };
@@ -85,7 +90,10 @@ public class JBpmMusicService extends Service {
     }
 
     private void playSongIfPossible() {
-        //if(mediaPlayer.getPlaybackParams().)
+        if(!shouldPlay){
+            return;
+        }
+        
         if (mediaPlayer != null) {
             mediaPlayer.start();
         }
@@ -215,7 +223,6 @@ public class JBpmMusicService extends Service {
             mediaPlayer.release();
         mediaPlayer = null;
         unregisterReceiver(this.broadcastReceiver);
-        Toast.makeText(this, "Service Detroyed!", Toast.LENGTH_SHORT).show();
     }
 
     @Override
