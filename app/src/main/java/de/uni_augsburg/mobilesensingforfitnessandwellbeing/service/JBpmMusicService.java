@@ -94,7 +94,7 @@ public class JBpmMusicService extends Service
 
     private void startProgressBroadcastCountdown() {
 
-        this.countdownTimer = new CountDownTimer(Long.MAX_VALUE, 1000) {
+        this.countdownTimer = new CountDownTimer(Long.MAX_VALUE, 500) {
 
             public void onTick(long millisUntilFinished) {
                 int position = mediaPlayer.getCurrentPosition() / 1000;
@@ -104,6 +104,7 @@ public class JBpmMusicService extends Service
                         BroadcastAction.PLAYBACK.PROGRESS.EXTRA_PROGRESS,
                         position
                 );
+                sendBroadcast(broadcast);
             }
 
             public void onFinish() {
@@ -223,7 +224,7 @@ public class JBpmMusicService extends Service
     @Override
     public void onPrepared(MediaPlayer mp) {
         Log.d("mediaplayer", "started");
-        mp.start();
+        playSongIfPossible();
     }
 
     @Override
@@ -238,6 +239,6 @@ public class JBpmMusicService extends Service
 
     @Override
     public void onSeekComplete(MediaPlayer mp) {
-        mp.start();
+        playSongIfPossible();
     }
 }

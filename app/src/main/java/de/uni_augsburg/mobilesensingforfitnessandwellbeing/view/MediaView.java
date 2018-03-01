@@ -194,8 +194,6 @@ public class MediaView extends ConstraintLayout {
                     setCurrentSong(nextSong);
                     break;
             }
-
-            Log.d("Service", intent.getAction() + intent.getStringExtra("testExtra"));
         }
     };
 
