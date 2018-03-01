@@ -9,10 +9,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
+
 import com.jjoe64.graphview.GraphView;
 
-import java.security.Permission;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.BpmMappedSong;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.LocalMusicProvider;
@@ -46,30 +45,31 @@ public class JBpmActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
         registerBroadcastReceivers();
     }
 
     @Override
-    protected void onPause(){
+    protected void onPause() {
         super.onPause();
         unregisterBroadcastReceivers();
     }
 
     @Override
-    protected void onDestroy()
-    {
+    protected void onDestroy() {
         super.onDestroy();
         stopService(new Intent(JBpmActivity.this, JBpmMusicService.class));
     }
 
     private void registerBroadcastReceivers() {
         registerReceiver(mediaView.getBroadcastReceiver(), mediaView.getIntentFilter());
+        this.sensorGraphView.registerBroadcastReceiver(this);
     }
 
     private void unregisterBroadcastReceivers() {
         unregisterReceiver(mediaView.getBroadcastReceiver());
+        this.sensorGraphView.unregisterBroadcastReceiver(this);
     }
 
     private void startMusicService() {
@@ -122,9 +122,6 @@ public class JBpmActivity extends AppCompatActivity {
 
     private void init() {
         this.musicProvider = new LocalMusicProvider(this);
-        BpmMappedSong newSong = this.musicProvider.getNextSong(100);
-        this.mediaView.setCurrentSong(newSong);
-        broadcastNewSong(newSong);
         this.mediaView.setMediaListener(new MediaListener() {
 
             @Override
@@ -132,19 +129,17 @@ public class JBpmActivity extends AppCompatActivity {
                 musicProvider.dislike(null); // TODO: Get current song from music service
                 BpmMappedSong bpmMappedSong = musicProvider.getNextSong(100f); // TODO: Get current desired BPM From bpm service
                 broadcastNewSong(bpmMappedSong);
-                //mediaView.setCurrentSong(bpmMappedSong);
                 infoView.setCurrentSong(bpmMappedSong);
             }
 
             @Override
             public void onPlayStatusChange(boolean isPlaying) {
-                broadcastPlayStatus(isPlaying);
+                broadcastPlayStatusRequest(isPlaying);
             }
 
             @Override
             public void onSeekbarProgressChange(int progress) {
                 broadSeekbarChanged(progress);
-                Toast.makeText(JBpmActivity.this, "" + progress, Toast.LENGTH_SHORT).show();
             }
         });
         this.sensorGraphView = new SensorGraphView(this.graphView);
@@ -159,7 +154,7 @@ public class JBpmActivity extends AppCompatActivity {
         sendBroadcast(broadcast);
     }
 
-    private void broadcastPlayStatus(boolean isPlaying) {
+    private void broadcastPlayStatusRequest(boolean isPlaying) {
         Intent broadcast = new Intent();
         if (isPlaying) {
             broadcast.setAction(BroadcastAction.PLAYBACK.PLAY.ACTION);
