@@ -66,6 +66,7 @@ public class BTSensor extends Sensor {
         Log.e("whatever", device.getName());
         try {
             BluetoothSocket bluetoothSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
+            Log.e("wuuut", "conn wuuut: "+bluetoothSocket.toString());
             bluetoothSocket.connect();
             Log.e("woooot", "connect success");
         } catch (IOException e) {
