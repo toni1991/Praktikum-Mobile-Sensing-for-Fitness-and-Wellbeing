@@ -1,45 +1,52 @@
 package de.uni_augsburg.mobilesensingforfitnessandwellbeing.musicLibrary;
 
-import java.io.File;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * Created by Lukas B on 27.02.2018.
  */
 
-public class MusicTrack {
+public class MusicTrack implements Parcelable {
+
+    public static final Creator<MusicTrack> CREATOR = new Creator<MusicTrack>() {
+        @Override
+        public MusicTrack createFromParcel(Parcel in) {
+            return new MusicTrack(in);
+        }
+
+        @Override
+        public MusicTrack[] newArray(int size) {
+            return new MusicTrack[size];
+        }
+    };
 
     private String path;
     private String name;
     private float bpm;
     private String genre;
-    private File audioFile;
 
-    MusicTrack() {
+    public MusicTrack(){
 
     }
 
-    public void setName(String name) {
-        this.name = name;
+    protected MusicTrack(Parcel in) {
+        path = in.readString();
+        name = in.readString();
+        bpm = in.readFloat();
+        genre = in.readString();
     }
 
-    void setBPM(float bpm) {
+    public void setBPM(float bpm) {
         this.bpm = bpm;
-    }
-
-    void setPath(String path) {
-        this.path = path;
-    }
-
-    void setGenre(String genre) {
-        this.genre = genre;
-    }
-
-    public void setAudioFile(File audioFile) {
-        this.audioFile = audioFile;
     }
 
     public String getName() {
         return this.name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public float getBpm() {
@@ -50,10 +57,28 @@ public class MusicTrack {
         return this.path;
     }
 
+    public void setPath(String path) {
+        this.path = path;
+    }
+
     public String getGenre() {
         return this.genre;
     }
 
-    public File getAudioFile() { return this.audioFile; }
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(path);
+        dest.writeString(name);
+        dest.writeFloat(bpm);
+        dest.writeString(genre);
+    }
 }

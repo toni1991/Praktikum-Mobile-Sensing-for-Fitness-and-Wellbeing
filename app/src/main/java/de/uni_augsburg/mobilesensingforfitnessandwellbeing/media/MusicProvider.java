@@ -8,6 +8,8 @@ import android.preference.PreferenceManager;
 
 import java.io.File;
 
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.musicLibrary.MusicTrack;
+
 /**
  * Created by toni on 28.02.18.
  */
@@ -21,9 +23,9 @@ public abstract class  MusicProvider {
         this.context = context;
     }
 
-    public abstract BpmMappedSong getNextSong(float bpm);
+    public abstract MusicTrack getNextSong(float bpm);
 
-    public abstract void dislike(BpmMappedSong bpmMappedSong);
+    public abstract void dislike(MusicTrack bpmMappedSong);
 
     final protected File getMediaDirectory()
     {

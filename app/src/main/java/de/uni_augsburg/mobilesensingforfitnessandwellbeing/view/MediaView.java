@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.media.MediaMetadataRetriever;
 import android.support.constraint.ConstraintLayout;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
@@ -16,8 +15,8 @@ import android.widget.TextView;
 import java.io.File;
 
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
-import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.BpmMappedSong;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MediaListener;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.musicLibrary.MusicTrack;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
 
 /**
@@ -33,7 +32,7 @@ public class MediaView extends ConstraintLayout {
     private ImageButton mediaPlayPauseButton;
     private ImageButton mediaSkipButton;
 
-    private BpmMappedSong currentSong;
+    private MusicTrack currentSong;
 
     private boolean isPlaying = false;
     private boolean currentlySeeking = false;
@@ -148,8 +147,8 @@ public class MediaView extends ConstraintLayout {
         timeTextView.setText(minutes + ":" + String.format("%02d", seconds));
     }
 
-    public void setCurrentSong(BpmMappedSong currentSong) {
-        if(new File(currentSong.getAudioFile()).isFile()) {
+    public void setCurrentSong(MusicTrack currentSong) {
+        if(new File(currentSong.getPath()).isFile()) {
             this.currentSong = currentSong;
             setMediaTitleOfCurrentSong();
             setMediaTotalTimeOfCurrentSong();
@@ -158,7 +157,7 @@ public class MediaView extends ConstraintLayout {
     }
 
     private void setMediaTitleOfCurrentSong() {
-        setMediaTitle(new File(this.currentSong.getAudioFile()));
+        setMediaTitle(new File(this.currentSong.getPath()));
     }
 
     private void setMediaTitle(File audioFile) {
@@ -173,7 +172,7 @@ public class MediaView extends ConstraintLayout {
     }
 
     private void setMediaTotalTimeOfCurrentSong() {
-        setMediaTotalTime(this.currentSong.getAudioFile());
+        setMediaTotalTime(this.currentSong.getPath());
     }
 
     public void setMediaListener(MediaListener mediaListener) {
@@ -188,8 +187,6 @@ public class MediaView extends ConstraintLayout {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            Log.d("BroadcastReceiver MediaView", "Action: " + intent.getAction());
-
             String s = intent.getAction();
             if (s.equals(BroadcastAction.PLAYBACK.PROGRESS.ACTION)) {
                 if(!currentlySeeking) {
@@ -198,7 +195,7 @@ public class MediaView extends ConstraintLayout {
                 }
 
             } else if (s.equals(BroadcastAction.FILE.NEXT_SONG.ACTION)) {
-                BpmMappedSong nextSong = intent.getParcelableExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG);
+                MusicTrack nextSong = intent.getParcelableExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG);
                 setCurrentSong(nextSong);
 
             } else if (s.equals(BroadcastAction.PLAYBACK.PLAYBACK_TOGGLED.ACTION)) {
