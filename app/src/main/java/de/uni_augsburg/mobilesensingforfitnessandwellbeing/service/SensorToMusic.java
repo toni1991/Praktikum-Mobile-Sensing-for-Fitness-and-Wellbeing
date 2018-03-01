@@ -102,11 +102,11 @@ public class SensorToMusic extends Service {
             sensors.put(accSensor.getSensorName(), accSensor);
         }
 
-        /*
-        Sensor btSensor = new BTSensor(this);
-        if(activatedSensors.contains(btSensor.getSensorName())) {
-            sensors.put(btSensor.getSensorName(), btSensor);
-        }*/
+
+//        Sensor btSensor = new BTSensor(this);
+//        if(activatedSensors.contains(btSensor.getSensorName())) {
+//            sensors.put(btSensor.getSensorName(), btSensor);
+//        }
 
 
         sensors.forEach((name,sensor)->sensor.initialize());

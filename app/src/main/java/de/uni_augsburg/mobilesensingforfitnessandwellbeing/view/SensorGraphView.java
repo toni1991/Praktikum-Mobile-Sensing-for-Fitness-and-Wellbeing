@@ -56,31 +56,25 @@ public class SensorGraphView
 
     public void registerSensor(String newSensor)
     {
-        Log.e("graphView", "starting reg");
         this.sensorNames.add(newSensor);
         this.sensorMap.put(newSensor, new ArrayList<>());
         LineGraphSeries<DataPoint> newSeries = new LineGraphSeries<>();
         this.graph.addSeries(newSeries);
         this.seriesMap.put(newSensor, newSeries);
         this.mSeries.add(newSeries);
-        Log.e("graphView", "finished reg");
     }
 
     private void pushNewDataPoint(String sensor, DataPoint newPoint)
     {
         this.sensorMap.get(sensor).add(newPoint);
-        Log.e("graphView", "finished push");
     }
 
     public void pushNewData(String sensor, double value)
     {
-        Log.e("graphView", "starting push");
         double timeDiff = (double) ( (System.currentTimeMillis() - this.startTime) / 1000);
         DataPoint newData = new DataPoint(timeDiff, value);
         this.pushNewDataPoint(sensor, newData);
     }
-
-
 
     private DataPoint getLatestPoint(String sensor)
     {
@@ -202,14 +196,12 @@ public class SensorGraphView
             @Override
             public void run()
             {
-                Log.e("graphView", "starting run");
                 if (!seriesMap.keySet().isEmpty())
                 {
                     seriesMap.keySet().forEach(s -> {
                         seriesMap.get(s).appendData(new DataPoint(getLatestPoint(s).getX(), getLatestPoint(s).getY()),
                                 true, 1000);
                     });
-                    Log.e("graphView", "seriesMap on the run");
                 }
 //                graphLastXValue += 1d;
 //                mSeries1.appendData(new DataPoint(graphLastXValue, getRandom()), true, 40);
