@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.LinkedList;
 
 import android.os.CountDownTimer;
+import android.util.Log;
 
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.musicLibrary.MusicTrack;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.musicLibrary.TrackFinder;
@@ -35,6 +36,8 @@ import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
 
 public class SensorToMusic extends Service {
 
+    public static long lastChangedSong; // mills
+
     private BroadcastReceiver broadcastReceiver;
     private CountDownTimer countDownTimer;
 
@@ -43,13 +46,18 @@ public class SensorToMusic extends Service {
     private LinkedList<Long> Times;
     private long windowLength;
 
-    private long lastChangedSong; // mills
     private long minSongDuration; // mills
 
     private TrackFinder trackFinder;
 
     float lastBPMEstimation = -100.0f;
     float bpmSongChangeThreshold;
+
+    public void onCreate()
+    {
+        lastChangedSong = 1;
+    }
+
 
     @Nullable
     @Override
@@ -58,14 +66,21 @@ public class SensorToMusic extends Service {
     }
 
     @Override
-    public void onCreate() {
+
+    public void onDestroy()
+    {
+        super.onDestroy();
+        this.unregisterBroadcastReciever();
+    }
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d("timed", "reset" );
 
         trackFinder = new TrackFinder(this.getApplicationContext());
 
         windowLength = 1500;
         minSongDuration = 10 * 1000; // 10 sec
         bpmSongChangeThreshold = 25;
-        lastChangedSong = 0;
 
         this.BPMs = new LinkedList<>();
         this.Times = new LinkedList<>();
@@ -76,7 +91,7 @@ public class SensorToMusic extends Service {
                 switch (intent.getAction()) {
                     case BroadcastAction.FILE.REQUEST_NEXT_SONG.ACTION:
                     {
-                        lastChangedSong = System.currentTimeMillis();
+                        SensorToMusic.lastChangedSong = System.currentTimeMillis();
                         boolean dislike =  intent.getBooleanExtra(BroadcastAction.FILE.REQUEST_NEXT_SONG.EXTRA_DISLIKE, false);
 
                         if (lastBPMEstimation < 0.0f)
@@ -138,6 +153,7 @@ public class SensorToMusic extends Service {
 
         }.start();
 
+        return START_STICKY;
     }
 
     private void addBPMEstimation(Sensor sensor, long time)
@@ -179,12 +195,17 @@ public class SensorToMusic extends Service {
 
     private void decisionNewSong(long time, float bpmEstimation)
     {
-        if (!(lastChangedSong + this.minSongDuration > time))
+        Long tmp = (time - SensorToMusic.lastChangedSong );
+        Log.d("blubb", tmp.toString()  );
+
+
+        if (!(time - SensorToMusic.lastChangedSong  > + this.minSongDuration ))
             return;
+
 
         if (Math.abs(bpmEstimation - lastBPMEstimation) > bpmSongChangeThreshold)
         {
-            lastChangedSong = System.currentTimeMillis();
+            SensorToMusic.lastChangedSong= System.currentTimeMillis();
             broadcastNewSong(bpmEstimation, false);
         }
     }
