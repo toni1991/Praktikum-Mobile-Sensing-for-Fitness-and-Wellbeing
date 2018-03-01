@@ -53,6 +53,12 @@
             android:name=".service.JBpmMusicService"
             android:enabled="true"
             android:exported="true"></service>
+
+        <service
+            android:name=".service.SensorToMusic"
+            android:enabled="true"
+            android:exported="true"></service>
+        <receiver android:name=".service.SensorToMusic" />
     </application>
 
 </manifest>

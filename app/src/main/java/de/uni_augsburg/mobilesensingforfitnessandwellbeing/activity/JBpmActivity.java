@@ -44,7 +44,7 @@ public class JBpmActivity extends AppCompatActivity {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE}
                 );
         findViews();
-        init();
+        //init();
     }
 
     private void startMusicService() {

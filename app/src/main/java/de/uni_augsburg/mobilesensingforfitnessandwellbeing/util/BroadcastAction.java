@@ -20,6 +20,7 @@ public interface BroadcastAction {
             String ACTION = "de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.PROGRESS";
             String EXTRA_PROGRESS = "progress";
         }
+
     }
 
     interface FILE {
@@ -29,6 +30,15 @@ public interface BroadcastAction {
         interface NEXT_SONG {
             String ACTION = "de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.NEXT_SONG";
             String EXTRA_SONG = "song";
+        }
+    }
+
+    interface VALUES {
+        interface VALUEBROADCAST {
+            String ACTION = "de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.VALUEBROADCAST";
+            String EXTRA_SENSORNAME = "sensorname";
+            String EXTRA_VALUENAME = "valuename";
+            String EXTRA_VALUE = "extraValue";
         }
     }
 }

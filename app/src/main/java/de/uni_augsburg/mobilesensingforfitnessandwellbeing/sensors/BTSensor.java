@@ -49,8 +49,7 @@ public class BTSensor extends Sensor {
         return this.isReady;
     }
 
-    @Override
-    public String[] necessaryPermissions() {
+    public static String[] necessaryPermissions() {
         return new String[]{Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN};
     }
 

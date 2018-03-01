@@ -1,5 +1,11 @@
 package de.uni_augsburg.mobilesensingforfitnessandwellbeing.activity;
 
+
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -24,20 +30,41 @@ import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.AccSensor;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.GpsSensor;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.Sensor;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.service.SensorToMusic;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
 
 public class SensorTestActivity extends AppCompatActivity {
 
     private CountDownTimer countDownTimer;
-    private Map<String, Sensor> sensors;
+    //private Map<String, Sensor> sensors;
 
     private EditText logText;
     private Spinner sensorSpinner;
     private Button startButton;
     private Button clearButton;
 
+    private BroadcastReceiver broadcastReceiver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        this.broadcastReceiver = new BroadcastReceiver() {
+
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                switch (intent.getAction()) {
+                    case BroadcastAction.VALUES.VALUEBROADCAST.ACTION:
+                        logText.append(
+                                        "sensor: " + intent.getStringExtra(BroadcastAction.VALUES.VALUEBROADCAST.EXTRA_SENSORNAME) + "\n" +
+                                        "value_name: " + intent.getStringExtra(BroadcastAction.VALUES.VALUEBROADCAST.EXTRA_VALUENAME) + "\n" +
+                                        "value: " + intent.getDoubleExtra(BroadcastAction.VALUES.VALUEBROADCAST.EXTRA_VALUE,0.0d) + "\n");
+                        break;
+                }
+            }
+        };
+        registerBroadcastReceiver();
+
         setContentView(R.layout.activity_sensor_test);
 
         findViews();
@@ -80,7 +107,6 @@ public class SensorTestActivity extends AppCompatActivity {
                     startButton.setText(R.string.button_stop);
                     startSensor();
                 } else {
-                    countDownTimer.cancel();
                     startButton.setText(R.string.button_start);
                 }
             }
@@ -88,6 +114,15 @@ public class SensorTestActivity extends AppCompatActivity {
     }
 
     private void initSensors() {
+
+        requestPermissions(BTSensor.necessaryPermissions());
+        requestPermissions(GpsSensor.necessaryPermissions());
+
+        Intent i =new Intent(getApplicationContext(),SensorToMusic.class);
+        startService(i);
+        android.util.Log.d("application start", "x");
+
+        /*
         sensors = new HashMap<>();
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -110,16 +145,18 @@ public class SensorTestActivity extends AppCompatActivity {
         if(activatedSensors.contains(btSensor.getSensorName())) {
             requestPermissions(btSensor.necessaryPermissions());
             sensors.put(btSensor.getSensorName(), btSensor);
-        }
+        }*/
     }
 
     private void initSensorSpinner() {
+        /*
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, new ArrayList<>(sensors.keySet()));
         adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
         sensorSpinner.setAdapter(adapter);
 
         sensorSpinner.setSelection(0);
+        */
     }
 
     private void requestPermissions(String[] permissions) {
@@ -134,6 +171,8 @@ public class SensorTestActivity extends AppCompatActivity {
     }
 
     private void startSensor() {
+
+        /*
         final Sensor sensor = sensors.get(sensorSpinner.getSelectedItem().toString());
         sensor.initialize();
 
@@ -156,5 +195,12 @@ public class SensorTestActivity extends AppCompatActivity {
             }
 
         }.start();
+        */
+    }
+
+    private void registerBroadcastReceiver() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BroadcastAction.VALUES.VALUEBROADCAST.ACTION);
+        registerReceiver(this.broadcastReceiver, filter);
     }
 }
