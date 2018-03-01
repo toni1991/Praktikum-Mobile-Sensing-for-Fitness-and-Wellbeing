@@ -162,7 +162,7 @@ public class TrackFinder extends MusicProvider{
                 }
                 oldDiff = diff;
             }
-            if(index <= queueSet.size()) {
+            if(index < queueSet.size()) {
                 retval = queueSet.get(index);
             }
         }
