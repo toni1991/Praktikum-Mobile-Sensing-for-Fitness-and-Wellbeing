@@ -112,7 +112,7 @@ public class SensorToMusic extends Service {
 
 
 //        Sensor btSensor = new BTSensor(this);
-//        if(activatedSensors.contains(btSensor.getSensorName())) {
+//        if(activatedSensors.contains(btSensor.getSensorName()) || activatedSensors.isEmpty()) {
 //            sensors.put(btSensor.getSensorName(), btSensor);
 //        }
 

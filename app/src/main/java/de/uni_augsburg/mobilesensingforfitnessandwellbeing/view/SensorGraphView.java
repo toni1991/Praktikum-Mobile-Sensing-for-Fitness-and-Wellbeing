@@ -13,6 +13,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
@@ -62,6 +63,9 @@ public class SensorGraphView
         this.graph.addSeries(newSeries);
         this.seriesMap.put(newSensor, newSeries);
         this.mSeries.add(newSeries);
+        newSeries.setTitle(newSensor);
+        this.graph.getLegendRenderer().setVisible(true);
+        this.graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
     }
 
     private void pushNewDataPoint(String sensor, DataPoint newPoint)

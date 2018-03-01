@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
@@ -68,7 +69,7 @@ public class BTSensor extends Sensor implements SensorEventListener
         BluetoothDevice device = btAdapter.getRemoteDevice("F1:CD:28:6D:BF:79");
         Log.e("whatever", device.getName());
         try {
-            BluetoothSocket bluetoothSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
+            BluetoothSocket bluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(MY_UUID);
             Log.e("wuuut", "conn wuuut: "+bluetoothSocket.toString());
             bluetoothSocket.connect();
             Log.e("woooot", "connect success");
