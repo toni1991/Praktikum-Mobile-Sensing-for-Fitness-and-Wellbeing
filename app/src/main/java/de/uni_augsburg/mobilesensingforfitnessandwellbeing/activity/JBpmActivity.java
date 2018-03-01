@@ -64,10 +64,12 @@ public class JBpmActivity extends AppCompatActivity {
 
     private void registerBroadcastReceivers() {
         registerReceiver(mediaView.getBroadcastReceiver(), mediaView.getIntentFilter());
+        this.sensorGraphView.registerBroadcastReceiver(this);
     }
 
     private void unregisterBroadcastReceivers() {
         unregisterReceiver(mediaView.getBroadcastReceiver());
+        this.sensorGraphView.unregisterBroadcastReceiver(this);
     }
 
     private void startMusicService() {
