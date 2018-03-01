@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -34,7 +35,6 @@ import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
  */
 
 public class SensorGraphView
-        //extends GraphView
 {
 
     private ArrayList<String> sensorNames = new ArrayList<>();
@@ -50,7 +50,9 @@ public class SensorGraphView
     private BroadcastReceiver receiver;
 
     private long startTime;
-    private double graphLastXValue = 5d;
+    private int graphColorCounter;
+    private ArrayList<Integer> graphColors = new ArrayList<>();
+//    private double graphLastXValue = 5d;
     double mLastRandom = 2;
     Random mRand = new Random();
 
@@ -60,10 +62,13 @@ public class SensorGraphView
         this.sensorNames.add(newSensor);
         this.sensorMap.put(newSensor, new ArrayList<>());
         LineGraphSeries<DataPoint> newSeries = new LineGraphSeries<>();
+        newSeries.setTitle(newSensor);
+        newSeries.setColor( (this.graphColorCounter < this.graphColors.size()) ?
+                this.graphColors.get(this.graphColorCounter) : Color.YELLOW);
+        this.graphColorCounter++;
         this.graph.addSeries(newSeries);
         this.seriesMap.put(newSensor, newSeries);
         this.mSeries.add(newSeries);
-        newSeries.setTitle(newSensor);
         this.graph.getLegendRenderer().setVisible(true);
         this.graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
     }
@@ -148,6 +153,11 @@ public class SensorGraphView
 //        Log.e("hm2...", ""+(this.graph == null));
 //        this.graph.addSeries(mSeries1);
 //        this.graph.addSeries(mSeries2);
+        this.graphColors.add(Color.BLUE);
+        this.graphColors.add(Color.GREEN);
+        this.graphColors.add(Color.BLACK);
+        this.graphColors.add(Color.MAGENTA);
+        this.graphColorCounter = 0;
         this.graph.getViewport().setXAxisBoundsManual(true);
         this.graph.getViewport().setMinX(0);
         this.graph.getViewport().setMaxX(40);
