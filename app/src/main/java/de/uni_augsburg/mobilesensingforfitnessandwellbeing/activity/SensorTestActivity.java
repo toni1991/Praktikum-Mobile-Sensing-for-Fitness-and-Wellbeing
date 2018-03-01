@@ -15,29 +15,21 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.BTSensor;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+
 
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
-import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.AccSensor;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.GpsSensor;
-import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.Sensor;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.service.SensorToMusic;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
 
 public class SensorTestActivity extends AppCompatActivity {
 
-    private CountDownTimer countDownTimer;
-    //private Map<String, Sensor> sensors;
-
+    private ArrayList<String> allPermissions;
     private EditText logText;
     private Spinner sensorSpinner;
     private Button startButton;
@@ -48,6 +40,8 @@ public class SensorTestActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        this.allPermissions = new ArrayList<>();
 
         this.broadcastReceiver = new BroadcastReceiver() {
 
@@ -113,40 +107,51 @@ public class SensorTestActivity extends AppCompatActivity {
         });
     }
 
-    private void initSensors() {
-
-        requestPermissions(BTSensor.necessaryPermissions());
-        requestPermissions(GpsSensor.necessaryPermissions());
-
+    private void startService() {
         Intent i =new Intent(getApplicationContext(),SensorToMusic.class);
         startService(i);
         android.util.Log.d("application start", "x");
-
-        /*
-        sensors = new HashMap<>();
-
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        Set<String> activatedSensors = settings.getStringSet("pref_sensors", new HashSet<String>());
-
-        // Put new sensors over here
-        Sensor gpsSensor = new GpsSensor(this);
-        if (activatedSensors.contains(gpsSensor.getSensorName())) {
-            requestPermissions(gpsSensor.necessaryPermissions());
-            sensors.put(gpsSensor.getSensorName(), gpsSensor);
-        }
-
-        Sensor accSensor = new AccSensor(this);
-        if (activatedSensors.contains(accSensor.getSensorName())) {
-            requestPermissions(accSensor.necessaryPermissions());
-            sensors.put(accSensor.getSensorName(), accSensor);
-        }
-
-        Sensor btSensor = new BTSensor(this);
-        if(activatedSensors.contains(btSensor.getSensorName())) {
-            requestPermissions(btSensor.necessaryPermissions());
-            sensors.put(btSensor.getSensorName(), btSensor);
-        }*/
     }
+
+    private void initSensors() {
+        logText.append("initSensors");
+        boolean request1 = requestPermissions(BTSensor.necessaryPermissions());
+        boolean request2 = requestPermissions(GpsSensor.necessaryPermissions()) ;
+        if (request1 && request2)
+        {
+            startService();
+        }
+    }
+
+    private boolean checkPermissions() {
+        boolean allPermissionsGranted = true;
+
+        for (String permission : allPermissions) {
+            if (ActivityCompat.checkSelfPermission(this, permission) !=
+                    PackageManager.PERMISSION_GRANTED) {
+                allPermissionsGranted = false;
+            }
+        }
+        return allPermissionsGranted;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+
+        // If request is cancelled, the result arrays are empty.
+        if (grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            logText.append("permission: " + "?" + " newly granted \n");
+
+            if (checkPermissions())
+                startService();
+
+        } else {
+            logText.append("permission: " + "?" + " denied \n");
+        }
+    }
+
 
     private void initSensorSpinner() {
         /*
@@ -159,15 +164,22 @@ public class SensorTestActivity extends AppCompatActivity {
         */
     }
 
-    private void requestPermissions(String[] permissions) {
+    private boolean requestPermissions(String[] permissions) {
+        boolean allPermissionsGranted = false;
         for (String permission : permissions) {
             if (ActivityCompat.checkSelfPermission(this, permission) !=
-                    PackageManager.PERMISSION_GRANTED) {
+                    PackageManager.PERMISSION_GRANTED)
+            {
                 ActivityCompat.requestPermissions(this,
                         new String[]{permission},
                         0);
+                allPermissions.add(permission);
+                allPermissionsGranted = false;
+                logText.append("permission " + permission);
+
             }
         }
+        return allPermissionsGranted;
     }
 
     private void startSensor() {

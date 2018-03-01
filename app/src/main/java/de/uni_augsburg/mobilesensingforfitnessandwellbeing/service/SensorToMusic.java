@@ -61,12 +61,12 @@ public class SensorToMusic extends Service {
         Set<String> activatedSensors = settings.getStringSet("pref_sensors", new HashSet<String>());
 
         // Put new sensors over here
-        /*
+
         Sensor gpsSensor = new GpsSensor(this);
         if (activatedSensors.contains(gpsSensor.getSensorName())) {
             sensors.put(gpsSensor.getSensorName(), gpsSensor);
         }
-        */
+
         Sensor accSensor = new AccSensor(this);
         if (activatedSensors.contains(accSensor.getSensorName())) {
             sensors.put(accSensor.getSensorName(), accSensor);
@@ -76,8 +76,8 @@ public class SensorToMusic extends Service {
         Sensor btSensor = new BTSensor(this);
         if(activatedSensors.contains(btSensor.getSensorName())) {
             sensors.put(btSensor.getSensorName(), btSensor);
-        }
-        */
+        }*/
+
 
         sensors.forEach((name,sensor)->sensor.initialize());
 
