@@ -29,6 +29,7 @@ public class JBpmMusicService extends Service {
     private MediaPlayer mediaPlayer = null;
     private MusicTrack currentSong;
     private CountDownTimer countdownTimer;
+    private boolean shouldPlay = false;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -38,12 +39,14 @@ public class JBpmMusicService extends Service {
 
             String s = intent.getAction();
             if (s.equals(BroadcastAction.PLAYBACK.PLAY.ACTION)) {
+                shouldPlay = true;
                 if (currentSong == null) {
                     broadcastRequestNextSong(false);
                 } else {
                     playSongIfPossible();
                 }
             } else if (s.equals(BroadcastAction.PLAYBACK.PAUSE.ACTION)) {
+                shouldPlay = false;
                 pauseIfNotNullAndPlaying();
                 stopCountdownTimerIfRunning();
             } else if (s.equals(BroadcastAction.PLAYBACK.SET_PROGRESS.ACTION)) {
@@ -87,7 +90,10 @@ public class JBpmMusicService extends Service {
     }
 
     private void playSongIfPossible() {
-        //if(mediaPlayer.getPlaybackParams().)
+        if(!shouldPlay){
+            return;
+        }
+        
         if (mediaPlayer != null) {
             mediaPlayer.start();
         }
