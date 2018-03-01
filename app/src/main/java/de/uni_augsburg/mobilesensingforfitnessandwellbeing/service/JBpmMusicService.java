@@ -43,33 +43,30 @@ public class JBpmMusicService extends Service
 
             String s = intent.getAction();
             if (s.equals(BroadcastAction.PLAYBACK.PLAY.ACTION)) {
-                playSongIfPossible();
+                if (currentSong == null) {
+                    broadcastRequestNextSong();
+                } else {
+                    playSongIfPossible();
+                }
             } else if (s.equals(BroadcastAction.PLAYBACK.PAUSE.ACTION)) {
                 pauseIfNotNullAndPlaying();
                 stopCountdownTimerIfRunning();
-
-            } else if (s.equals(BroadcastAction.PLAYBACK.SKIP.ACTION)) {
             } else if (s.equals(BroadcastAction.PLAYBACK.SET_PROGRESS.ACTION)) {
                 int progress = intent.getIntExtra(BroadcastAction.PLAYBACK.SET_PROGRESS.EXTRA_PROGRESS, 0);
                 setMediaProgress(progress);
-
             } else if (s.equals(BroadcastAction.FILE.NEXT_SONG.ACTION)) {
                 stopCountdownTimerIfRunning();
                 currentSong = intent.getParcelableExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG);
                 prepareMediaPlayer();
                 showNotification();
-            } else if (s.equals(BroadcastAction.FILE.REQUEST_CURRENT_SONG.ACTION)) {
-                broadCastCurrentSong();
             }
         }
     };
 
     private void setMediaProgress(int progress) {
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.pause();
-            mediaPlayer.seekTo(progress * 1000);
-            mediaPlayer.start();
-        }
+        pauseIfNotNullAndPlaying();
+        mediaPlayer.seekTo(progress * 1000);
+        playSongIfPossible();
     }
 
     private void stopCountdownTimerIfRunning() {
@@ -82,14 +79,17 @@ public class JBpmMusicService extends Service
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
         }
+        stopCountdownTimerIfRunning();
+        broadcastPlayingToggled();
     }
 
     private void playSongIfPossible() {
-        //TODO Prepare if not done!
+        //if(mediaPlayer.getPlaybackParams().)
         if (mediaPlayer != null) {
             mediaPlayer.start();
         }
         startProgressBroadcastCountdown();
+        broadcastPlayingToggled();
     }
 
     private void startProgressBroadcastCountdown() {
@@ -97,28 +97,26 @@ public class JBpmMusicService extends Service
         this.countdownTimer = new CountDownTimer(Long.MAX_VALUE, 500) {
 
             public void onTick(long millisUntilFinished) {
-                int position = mediaPlayer.getCurrentPosition() / 1000;
-                Intent broadcast = new Intent();
-                broadcast.setAction(BroadcastAction.PLAYBACK.PROGRESS.ACTION);
-                broadcast.putExtra(
-                        BroadcastAction.PLAYBACK.PROGRESS.EXTRA_PROGRESS,
-                        position
-                );
-                sendBroadcast(broadcast);
+                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                    int position = mediaPlayer.getCurrentPosition() / 1000;
+                    Intent broadcast = new Intent();
+                    broadcast.setAction(BroadcastAction.PLAYBACK.PROGRESS.ACTION);
+                    broadcast.putExtra(
+                            BroadcastAction.PLAYBACK.PROGRESS.EXTRA_PROGRESS,
+                            position
+                    );
+                    sendBroadcast(broadcast);
+                } else {
+                    cancel();
+                }
             }
 
             public void onFinish() {
                 if (mediaPlayer.isPlaying())
-                    start();
+                    this.start();
             }
 
         }.start();
-    }
-
-    private void broadCastCurrentSong() {
-        Intent broadcast = new Intent();
-        broadcast.setAction(BroadcastAction.FILE.CURRENT_SONG.ACTION);
-        broadcast.putExtra(BroadcastAction.FILE.CURRENT_SONG.EXTRA_SONG, this.currentSong);
     }
 
     private void prepareMediaPlayer() {
@@ -159,7 +157,6 @@ public class JBpmMusicService extends Service
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.PLAYBACK.PLAY.ACTION);
         filter.addAction(BroadcastAction.PLAYBACK.PAUSE.ACTION);
-        filter.addAction(BroadcastAction.PLAYBACK.SKIP.ACTION);
         filter.addAction(BroadcastAction.PLAYBACK.SET_PROGRESS.ACTION);
         filter.addAction(BroadcastAction.FILE.NEXT_SONG.ACTION);
         registerReceiver(this.broadcastReceiver, filter);
@@ -177,7 +174,7 @@ public class JBpmMusicService extends Service
         String artist = "";
         String title = "";
 
-        if(currentSong != null && new File(currentSong.getAudioFile()).exists()) {
+        if (currentSong != null && new File(currentSong.getAudioFile()).exists()) {
             MediaMetadataRetriever mmR = new MediaMetadataRetriever();
             mmR.setDataSource(currentSong.getAudioFile());
             artist = mmR.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
@@ -229,10 +226,10 @@ public class JBpmMusicService extends Service
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        broadCastRequestNextSong();
+        broadcastRequestNextSong();
     }
 
-    private void broadCastRequestNextSong() {
+    private void broadcastRequestNextSong() {
         Intent broadcast = new Intent();
         broadcast.setAction(BroadcastAction.FILE.REQUEST_NEXT_SONG.ACTION);
     }
@@ -240,5 +237,14 @@ public class JBpmMusicService extends Service
     @Override
     public void onSeekComplete(MediaPlayer mp) {
         playSongIfPossible();
+    }
+
+    public void broadcastPlayingToggled() {
+        if (mediaPlayer != null) {
+            Intent broadcast = new Intent();
+            broadcast.setAction(BroadcastAction.PLAYBACK.PLAYBACK_TOGGLED.ACTION);
+            broadcast.putExtra(BroadcastAction.PLAYBACK.PLAYBACK_TOGGLED.EXTRA_ISPLAYING, mediaPlayer.isPlaying());
+            sendBroadcast(broadcast);
+        }
     }
 }
