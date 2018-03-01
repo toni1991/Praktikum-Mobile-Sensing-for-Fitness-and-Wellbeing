@@ -184,9 +184,12 @@ public class MediaView extends ConstraintLayout {
         String artist = mmR.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
         String title = mmR.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
 
-        String artistAndMaybeTitle = artist + (title.isEmpty() ? "" : " - " + title);
-
-        setMediaTitle(artistAndMaybeTitle.isEmpty() ? audioFile.getName() : artistAndMaybeTitle);
+        if(artist != null && title != null) {
+            setMediaTitle(artist + (title.isEmpty() ? "" : " - " + title));
+        }
+        else {
+            setMediaTitle(audioFile.getName());
+        }
     }
 
     private void setMediaTotalTimeOfCurrentSong() {
