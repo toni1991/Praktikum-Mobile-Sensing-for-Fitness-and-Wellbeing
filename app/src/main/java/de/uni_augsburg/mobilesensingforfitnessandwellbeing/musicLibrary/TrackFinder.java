@@ -1,6 +1,5 @@
 package de.uni_augsburg.mobilesensingforfitnessandwellbeing.musicLibrary;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Environment;
 import android.util.Range;
@@ -14,24 +13,24 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MusicProvider;
 
 /**
  * Created by Lukas B on 27.02.2018.
  */
 
-public class TrackFinder {
+public class TrackFinder extends MusicProvider{
 
-    private Context appContext;
-    private final File trackDirectory = new File(Environment.getExternalStorageDirectory() + "/PraktikumMobileSensing/music/");
+    private File trackDirectory;
     private ArrayList<MusicTrack> tracks = new ArrayList<>();
     private float minBPM;
     private float maxBPM;
     private ArrayList<SongQueue> hiPrioQueues;
     private ArrayList<SongQueue> loPrioQueues;
 
-    public TrackFinder(Context appContext) {
-        this.appContext = appContext;
+    public TrackFinder(Context context) {
+        super(context);
+        trackDirectory = getMediaDirectory();
         minBPM = Float.MAX_VALUE;
         maxBPM = Float.MIN_VALUE;
         loadTrackInformation();
@@ -39,6 +38,7 @@ public class TrackFinder {
         this.loPrioQueues = createLoPrioQueues();
     }
 
+    @Override
     public MusicTrack getNextSong(float bpm) {
 
         MusicTrack retval;
@@ -59,42 +59,7 @@ public class TrackFinder {
 
     }
 
-    private SongQueue getSuitableQueue(float bpm, ArrayList<SongQueue> queueSet) {
-
-        SongQueue retval = null;
-        boolean suitableQueueFound = false;
-        int numQueues = queueSet.size();
-        float diff = Float.MAX_VALUE;
-        float oldDiff = 0;
-        int index = 0;
-        Float[] queueLowers = new Float[numQueues];
-
-        //select queue with bpm range containing current track's bpm
-        if(queueSet != null) {
-            for (SongQueue q : queueSet) {
-                if (q.getBpmRange().contains(bpm)) {
-                    retval = q;
-                    suitableQueueFound = true;
-                }
-            }
-        }
-
-        //select nearest queue if no suitable queue has been found
-        if(!suitableQueueFound) {
-            for(int i=0; i<numQueues; i++) {
-                queueLowers[i] = queueSet.get(i).getBpmRange().getLower();
-                diff = Math.min(diff, Math.abs(bpm - queueLowers[i]));
-                if(diff != oldDiff) {
-                    index = i;
-                }
-                oldDiff = diff;
-            }
-            retval = queueSet.get(index);
-        }
-
-        return retval;
-    }
-
+    @Override
     public void dislike(MusicTrack track) {
 
         boolean removedFromHiPrio = false;
@@ -153,13 +118,49 @@ public class TrackFinder {
                     tracks.add(track);
                 }
                 catch(Exception e) {
-                    Toast.makeText(appContext, "Exception: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, "Exception: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
         }
         else {
-            Toast.makeText(appContext, "The specified directory could not be extracted.", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "The specified directory could not be extracted.", Toast.LENGTH_LONG).show();
         }
+    }
+
+    private SongQueue getSuitableQueue(float bpm, ArrayList<SongQueue> queueSet) {
+
+        SongQueue retval = null;
+        boolean suitableQueueFound = false;
+        int numQueues = queueSet.size();
+        float diff = Float.MAX_VALUE;
+        float oldDiff = 0;
+        int index = 0;
+        Float[] queueLowers = new Float[numQueues];
+
+        //select queue with bpm range containing current track's bpm
+        if(queueSet != null) {
+            for (SongQueue q : queueSet) {
+                if (q.getBpmRange().contains(bpm)) {
+                    retval = q;
+                    suitableQueueFound = true;
+                }
+            }
+        }
+
+        //select nearest queue if no suitable queue has been found
+        if(!suitableQueueFound) {
+            for(int i=0; i<numQueues; i++) {
+                queueLowers[i] = queueSet.get(i).getBpmRange().getLower();
+                diff = Math.min(diff, Math.abs(bpm - queueLowers[i]));
+                if(diff != oldDiff) {
+                    index = i;
+                }
+                oldDiff = diff;
+            }
+            retval = queueSet.get(index);
+        }
+
+        return retval;
     }
 
     private ArrayList<SongQueue> createHiPrioQueues() {
@@ -220,10 +221,10 @@ public class TrackFinder {
             bpm_string = br.readLine();
         }
         catch(FileNotFoundException e) {
-            Toast.makeText(appContext, "FileNotFoundException: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "FileNotFoundException: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
         catch(IOException e) {
-            Toast.makeText(appContext, "IOException: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "IOException: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
 
         return Float.parseFloat(bpm_string);
@@ -239,10 +240,10 @@ public class TrackFinder {
             retval = br.readLine();
         }
         catch(FileNotFoundException e) {
-            Toast.makeText(appContext, "FileNotFoundException: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "FileNotFoundException: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
         catch(IOException e) {
-            Toast.makeText(appContext, "IOException: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "IOException: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
 
         return retval;

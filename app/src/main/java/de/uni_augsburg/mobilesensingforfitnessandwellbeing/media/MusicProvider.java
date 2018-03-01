@@ -16,7 +16,7 @@ import de.uni_augsburg.mobilesensingforfitnessandwellbeing.musicLibrary.MusicTra
 
 public abstract class  MusicProvider {
 
-    private final Context context;
+    protected final Context context;
 
     protected MusicProvider(Context context)
     {

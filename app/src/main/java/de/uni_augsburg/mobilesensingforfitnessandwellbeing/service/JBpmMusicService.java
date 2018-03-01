@@ -25,8 +25,7 @@ import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MediaServiceCon
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.musicLibrary.MusicTrack;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
 
-public class JBpmMusicService extends Service
-{
+public class JBpmMusicService extends Service {
 
     private MediaPlayer mediaPlayer = null;
     private MusicTrack currentSong;
@@ -41,7 +40,7 @@ public class JBpmMusicService extends Service
             String s = intent.getAction();
             if (s.equals(BroadcastAction.PLAYBACK.PLAY.ACTION)) {
                 if (currentSong == null) {
-                    broadcastRequestNextSong();
+                    broadcastRequestNextSong(false);
                 } else {
                     playSongIfPossible();
                 }
@@ -61,9 +60,14 @@ public class JBpmMusicService extends Service
     };
 
     private void setMediaProgress(int progress) {
-        pauseIfNotNullAndPlaying();
+        boolean currentlyPlaying = (mediaPlayer != null && mediaPlayer.isPlaying());
+        if (currentlyPlaying) {
+            pauseIfNotNullAndPlaying();
+        }
         mediaPlayer.seekTo(progress * 1000);
-        playSongIfPossible();
+        if (currentlyPlaying) {
+            playSongIfPossible();
+        }
     }
 
     private void stopCountdownTimerIfRunning() {
@@ -150,8 +154,10 @@ public class JBpmMusicService extends Service
 
     private void setMediaPlayerListeners() {
         mediaPlayer.setOnPreparedListener((MediaPlayer mp) -> playSongIfPossible());
-        mediaPlayer.setOnCompletionListener((MediaPlayer mp) -> broadcastRequestNextSong());
-
+        mediaPlayer.setOnCompletionListener((MediaPlayer mp) -> {
+            broadcastRequestNextSong(false);
+            pauseIfNotNullAndPlaying();
+        });
     }
 
     private void registerBroadcastReceiver() {
@@ -218,9 +224,10 @@ public class JBpmMusicService extends Service
         return null;
     }
 
-    private void broadcastRequestNextSong() {
+    private void broadcastRequestNextSong(boolean dislike) {
         Intent broadcast = new Intent();
         broadcast.setAction(BroadcastAction.FILE.REQUEST_NEXT_SONG.ACTION);
+        broadcast.putExtra(BroadcastAction.FILE.REQUEST_NEXT_SONG.EXTRA_DISLIKE, dislike);
         sendBroadcast(broadcast);
     }
 

@@ -8,6 +8,8 @@ import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.util.Log;
 
 import java.io.IOException;
@@ -17,7 +19,8 @@ import java.util.UUID;
  * Created by Kevin on 28.02.2018.
  */
 
-public class BTSensor extends Sensor {
+public class BTSensor extends Sensor implements SensorEventListener
+{
 
     private boolean isReady;
     private final static int REQUEST_ENABLE_BT = 1;
@@ -73,5 +76,15 @@ public class BTSensor extends Sensor {
             e.printStackTrace();
         }
         this.isReady = true;
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+
+    }
+
+    @Override
+    public void onAccuracyChanged(android.hardware.Sensor sensor, int i) {
+
     }
 }

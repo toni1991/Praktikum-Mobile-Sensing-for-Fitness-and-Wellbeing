@@ -128,10 +128,7 @@ public class JBpmActivity extends AppCompatActivity {
 
             @Override
             public void onSkip() {
-                musicProvider.dislike(null); // TODO: Get current song from music service
-                MusicTrack bpmMappedSong = musicProvider.getNextSong(100f); // TODO: Get current desired BPM From bpm service
-                broadcastNewSong(bpmMappedSong);
-                infoView.setCurrentSong(bpmMappedSong);
+                broadcastRequestNextSong(true);
             }
 
             @Override
@@ -141,7 +138,7 @@ public class JBpmActivity extends AppCompatActivity {
 
             @Override
             public void onSeekbarProgressChange(int progress) {
-                broadSeekbarChanged(progress);
+                broadcastSeekbarChanged(progress);
             }
         });
         this.sensorGraphView = new SensorGraphView(this.graphView);
@@ -149,7 +146,14 @@ public class JBpmActivity extends AppCompatActivity {
         new Thread(this.sensorGraphView.getGraphListener()).start();
     }
 
-    private void broadSeekbarChanged(int progress) {
+    private void broadcastRequestNextSong(boolean dislike) {
+        Intent broadcast = new Intent();
+        broadcast.setAction(BroadcastAction.FILE.REQUEST_NEXT_SONG.ACTION);
+        broadcast.putExtra(BroadcastAction.FILE.REQUEST_NEXT_SONG.EXTRA_DISLIKE, dislike);
+        sendBroadcast(broadcast);
+    }
+
+    private void broadcastSeekbarChanged(int progress) {
         Intent broadcast = new Intent();
         broadcast.setAction(BroadcastAction.PLAYBACK.SET_PROGRESS.ACTION);
         broadcast.putExtra(BroadcastAction.PLAYBACK.SET_PROGRESS.EXTRA_PROGRESS, progress);
