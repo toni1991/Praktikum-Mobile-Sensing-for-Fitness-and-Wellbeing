@@ -5,6 +5,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.app.Activity;
+import android.util.Log;
 
 import java.util.LinkedList;
 
@@ -16,24 +17,29 @@ import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.DSPUitility;
 
 public class AccSensor extends Sensor implements SensorEventListener {
 
+    private int totalSteps;
     private LinkedList<Long> timeOfEvents;
-    private LinkedList<Float> xEvents;
-    private LinkedList<Float> yEvents;
-    private LinkedList<Float> zEvents;
+    private LinkedList<Float> rEvents;
+
+    private int windowLength;
+
+    private LinkedList<Long> timeOfSteps;
+    private LinkedList<Double> lastEnergy;
 
     public AccSensor (Context context)
     {
         super(context);
         super.setWindowLengthMillis(1500);
+        windowLength = 25;
+        lastEnergy = new LinkedList<>();
 
         senSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         senAccelerometer = senSensorManager.getDefaultSensor(android.hardware.Sensor.TYPE_ACCELEROMETER);
         senSensorManager.registerListener(this, senAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
-        xEvents = new LinkedList<>();
-        yEvents = new LinkedList<>();
-        zEvents = new LinkedList<>();
+        rEvents = new LinkedList<>();
         timeOfEvents = new LinkedList<>();
+        timeOfSteps = new LinkedList<>();
     }
 
     private SensorManager senSensorManager;
@@ -41,16 +47,41 @@ public class AccSensor extends Sensor implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
+
         android.hardware.Sensor mySensor = sensorEvent.sensor;
 
-        timeOfEvents.add(System.currentTimeMillis());
 
         if (mySensor.getType() == android.hardware.Sensor.TYPE_ACCELEROMETER) {
-            xEvents.add(sensorEvent.values[0]);
-            yEvents.add(sensorEvent.values[1]);
-            zEvents.add(sensorEvent.values[2]);
-        }
 
+            float newValue = (float) Math.sqrt(Math.pow(sensorEvent.values[0], 2) + Math.pow(sensorEvent.values[1], 2) + Math.pow(sensorEvent.values[2], 2));
+            newValue-= 10;
+            rEvents.add(newValue);
+            timeOfEvents.add(System.currentTimeMillis());
+
+            if (timeOfEvents.size() >= windowLength) {
+                if (timeOfEvents.size() != rEvents.size())
+                    throw new IllegalArgumentException("holy shit");
+
+                lastEnergy.add(DSPUitility.calculateShortTermEnergy(rEvents,rEvents.size()-windowLength, windowLength));
+
+                if (lastEnergy.size() == 3) {
+
+                    if (lastEnergy.get(2) > 6) {
+                        Double preLastDerivation = lastEnergy.get(1) - lastEnergy.get(0);
+                        double lastDerivation = lastEnergy.get(2) - lastEnergy.get(1);
+                       // Log.d("test", preLastDerivation.toString() + " " + newValue);
+
+                        if ((preLastDerivation > 0 && lastDerivation < 0) ||
+                                (preLastDerivation < 0 && lastDerivation > 0)) {
+                            totalSteps++;
+                            timeOfSteps.add(System.currentTimeMillis());
+                        }
+                    }
+                    lastEnergy.poll();
+                }
+
+            }
+        }
         clearOldSensorValues();
     }
 
@@ -58,10 +89,16 @@ public class AccSensor extends Sensor implements SensorEventListener {
         long currentTime = System.currentTimeMillis();
         while (!timeOfEvents.isEmpty() && currentTime - timeOfEvents.peek() > windowLengthMillis) {
             timeOfEvents.poll();
-            xEvents.poll();
-            yEvents.poll();
-            zEvents.poll();
+            rEvents.poll();
         }
+    }
+
+    private float calculateStepFrequency() {
+        long currentTime = System.currentTimeMillis();
+        while (!timeOfSteps.isEmpty() && currentTime - timeOfSteps.peek() > 10000) {
+            timeOfSteps.poll();
+        }
+        return timeOfSteps.size()  * 60 ;
     }
 
 
@@ -72,7 +109,7 @@ public class AccSensor extends Sensor implements SensorEventListener {
 
     @Override
     public float getCurrentlyDesiredBpm() {
-        return (float)DSPUitility.calculateShortTermEnergy(yEvents,0,50);
+        return calculateStepFrequency();
     }
 
     @Override
@@ -82,18 +119,15 @@ public class AccSensor extends Sensor implements SensorEventListener {
 
     @Override
     public double getRawSensorValue() {
-        return xEvents.peek();
+        return totalSteps;
     }
 
     @Override
     public boolean isReady() {
-        return (timeOfEvents.size() >= 50);
+        return true;
     }
 
-    @Override
-    public String[] necessaryPermissions() {
-        return new String[0];
-    }
+
 
     @Override
     public void initialize() {

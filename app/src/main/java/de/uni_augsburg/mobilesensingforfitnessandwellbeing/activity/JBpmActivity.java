@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
 
@@ -48,7 +49,7 @@ public class JBpmActivity extends AppCompatActivity {
                 Manifest.permission.WRITE_EXTERNAL_STORAGE}
                 );
         findViews();
-        init();
+        //init();
     }
 
     private void startMusicService() {
@@ -106,13 +107,13 @@ public class JBpmActivity extends AppCompatActivity {
 
     private void init() {
         this.musicProvider = new LocalMusicProvider(this);
-        this.mediaView.setMediaTotalTime(246);
+        this.mediaView.setCurrentSong(this.musicProvider.getNextSong(100));
         this.mediaView.setMediaListener(new MediaListener() {
 
             @Override
-            public void onSkip(BpmMappedSong bpmMappedSong) {
-                musicProvider.dislike(bpmMappedSong);
-                bpmMappedSong = musicProvider.getNextSong(100f);
+            public void onSkip() {
+                musicProvider.dislike(null); // TODO: Get current song from music service
+                BpmMappedSong bpmMappedSong = musicProvider.getNextSong(100f); // TODO: Get current desired BPM From bpm service
                 mediaView.setCurrentSong(bpmMappedSong);
                 infoView.setCurrentSong(bpmMappedSong);
             }
@@ -120,6 +121,11 @@ public class JBpmActivity extends AppCompatActivity {
             @Override
             public void onPlayStatusChange(boolean isPlaying) {
                 startMusicService();
+            }
+
+            @Override
+            public void onSeekbarProgressChange(int progress) {
+                Toast.makeText(JBpmActivity.this, ""+progress, Toast.LENGTH_SHORT).show();
             }
         });
         this.sensorGraphView = new SensorGraphView(this.graphView);

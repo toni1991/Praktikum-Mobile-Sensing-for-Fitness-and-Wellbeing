@@ -6,8 +6,9 @@ package de.uni_augsburg.mobilesensingforfitnessandwellbeing.media;
 
 public interface MediaListener {
 
-    void onSkip(BpmMappedSong bpmMappedSong);
+    void onSkip();
 
     void onPlayStatusChange(boolean isPlaying);
 
+    void onSeekbarProgressChange(int progress);
 }

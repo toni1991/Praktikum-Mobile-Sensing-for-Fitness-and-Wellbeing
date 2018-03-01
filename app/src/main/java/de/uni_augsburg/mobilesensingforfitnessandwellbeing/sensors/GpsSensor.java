@@ -42,8 +42,7 @@ public class GpsSensor extends Sensor implements LocationListener {
         getHeightFromPreferences();
     }
 
-    @Override
-    public String[] necessaryPermissions() {
+    public static String[] necessaryPermissions() {
         return new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
     }
 
