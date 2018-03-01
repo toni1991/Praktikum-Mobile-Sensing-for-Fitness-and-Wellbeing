@@ -49,8 +49,7 @@ public class BTSensor extends Sensor {
         return this.isReady;
     }
 
-    @Override
-    public String[] necessaryPermissions() {
+    public static String[] necessaryPermissions() {
         return new String[]{Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN};
     }
 
@@ -67,6 +66,7 @@ public class BTSensor extends Sensor {
         Log.e("whatever", device.getName());
         try {
             BluetoothSocket bluetoothSocket = device.createRfcommSocketToServiceRecord(MY_UUID);
+            Log.e("wuuut", "conn wuuut: "+bluetoothSocket.toString());
             bluetoothSocket.connect();
             Log.e("woooot", "connect success");
         } catch (IOException e) {

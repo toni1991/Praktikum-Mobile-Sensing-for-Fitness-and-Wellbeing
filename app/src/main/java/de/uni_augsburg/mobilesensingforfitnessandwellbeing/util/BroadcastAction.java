@@ -42,4 +42,17 @@ public interface BroadcastAction {
             String EXTRA_SONG = "song";
         }
     }
+
+    interface VALUES {
+        interface VALUEBROADCAST {
+            String ACTION = "de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.VALUEBROADCAST";
+            String EXTRA_SENSORNAME = "sensorname";
+            String EXTRA_VALUENAME = "valuename";
+            String EXTRA_VALUE = "extraValue";
+        }
+        interface BPMESTIMATION {
+            String ACTION = "de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BPMESTIMATION";
+            String EXTRA_VALUEBPM = "valuename";
+        }
+    }
 }
