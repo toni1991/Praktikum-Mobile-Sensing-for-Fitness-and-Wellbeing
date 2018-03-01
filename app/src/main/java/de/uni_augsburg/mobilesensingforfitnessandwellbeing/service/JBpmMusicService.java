@@ -25,8 +25,7 @@ import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MediaServiceCon
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.musicLibrary.MusicTrack;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
 
-public class JBpmMusicService extends Service
-{
+public class JBpmMusicService extends Service {
 
     private MediaPlayer mediaPlayer = null;
     private MusicTrack currentSong;
@@ -61,9 +60,14 @@ public class JBpmMusicService extends Service
     };
 
     private void setMediaProgress(int progress) {
-        pauseIfNotNullAndPlaying();
+        boolean currentlyPlaying = (mediaPlayer != null && mediaPlayer.isPlaying());
+        if (currentlyPlaying) {
+            pauseIfNotNullAndPlaying();
+        }
         mediaPlayer.seekTo(progress * 1000);
-        playSongIfPossible();
+        if (currentlyPlaying) {
+            playSongIfPossible();
+        }
     }
 
     private void stopCountdownTimerIfRunning() {
@@ -150,8 +154,10 @@ public class JBpmMusicService extends Service
 
     private void setMediaPlayerListeners() {
         mediaPlayer.setOnPreparedListener((MediaPlayer mp) -> playSongIfPossible());
-        mediaPlayer.setOnCompletionListener((MediaPlayer mp) -> broadcastRequestNextSong());
-
+        mediaPlayer.setOnCompletionListener((MediaPlayer mp) -> {
+            broadcastRequestNextSong();
+            pauseIfNotNullAndPlaying();
+        });
     }
 
     private void registerBroadcastReceiver() {
