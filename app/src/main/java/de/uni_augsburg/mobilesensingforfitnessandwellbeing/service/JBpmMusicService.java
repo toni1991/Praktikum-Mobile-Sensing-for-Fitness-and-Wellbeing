@@ -9,7 +9,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.CountDownTimer;
 import android.os.IBinder;
+import android.os.PowerManager;
+import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -22,61 +25,122 @@ import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.BpmMappedSong;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MediaServiceConstants;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
 
-public class JBpmMusicService extends Service implements MediaPlayer.OnPreparedListener {
+public class JBpmMusicService extends Service
+        implements
+        MediaPlayer.OnPreparedListener,
+        MediaPlayer.OnCompletionListener,
+        MediaPlayer.OnSeekCompleteListener {
 
-    private MediaPlayer mMediaPlayer = null;
+    private MediaPlayer mediaPlayer = null;
     private BpmMappedSong currentSong;
+    private CountDownTimer countdownTimer;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
 
+            Log.d("JBpmMusicService", "Action: " + intent.getAction());
+
             switch (intent.getAction()) {
                 case BroadcastAction.PLAYBACK.PLAY.ACTION:
-                    if (mMediaPlayer != null) {
-                        mMediaPlayer.start();
-                    }
+                    playSongIfPossible();
                     break;
                 case BroadcastAction.PLAYBACK.PAUSE.ACTION:
-                    if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
-                        mMediaPlayer.pause();
-                    }
+                    pauseIfNotNullAndPlaying();
+                    stopCountdownTimerIfRunning();
                     break;
                 case BroadcastAction.PLAYBACK.SKIP.ACTION:
                     break;
+                case BroadcastAction.PLAYBACK.SET_PROGRESS.ACTION:
+                    int progress = intent.getIntExtra(BroadcastAction.PLAYBACK.SET_PROGRESS.EXTRA_PROGRESS, 0);
+                    setMediaProgress(progress);
+                    break;
                 case BroadcastAction.FILE.NEXT_SONG.ACTION:
-                    prepareNewSong(intent);
+                    stopCountdownTimerIfRunning();
+                    currentSong = intent.getParcelableExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG);
+                    prepareMediaPlayer();
                     break;
                 case BroadcastAction.FILE.REQUEST_CURRENT_SONG.ACTION:
-                    Intent broadcast = new Intent();
-                    broadcast.setAction(BroadcastAction.FILE.CURRENT_SONG.ACTION);
-                    broadcast.putExtra(BroadcastAction.FILE.CURRENT_SONG.EXTRA_SONG, currentSong);
+                    broadCastCurrentSong();
                     break;
             }
-
-            Log.d("Service", intent.getAction() + intent.getStringExtra("testExtra"));
         }
     };
 
-    private void prepareNewSong(Intent intent) {
-        this.currentSong = intent.getParcelableExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG);
-        if (this.currentSong != null && !new File(this.currentSong.getAudioFile()).exists()) {
-            return;
+    private void setMediaProgress(int progress) {
+        if(mediaPlayer.isPlaying()){
+            mediaPlayer.pause();
+            mediaPlayer.seekTo(progress * 1000);
+            mediaPlayer.start();
         }
+    }
 
-        if (mMediaPlayer.isPlaying()) {
-            mMediaPlayer.stop();
+    private void stopCountdownTimerIfRunning() {
+        if(countdownTimer != null)
+        {
+            countdownTimer.cancel();
         }
+    }
 
-        try {
-            mMediaPlayer.setDataSource(
-                    getApplicationContext(), Uri.parse(currentSong.getAudioFile())
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
+    private void pauseIfNotNullAndPlaying() {
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
         }
+    }
 
-        mMediaPlayer.prepareAsync(); // prepare async to not block main thread
+    private void playSongIfPossible() {
+        //TODO Prepare if not done!
+        if (mediaPlayer != null) {
+            mediaPlayer.start();
+        }
+        startProgressBroadcastCountdown();
+    }
+
+    private void startProgressBroadcastCountdown() {
+
+        this.countdownTimer = new CountDownTimer(Long.MAX_VALUE, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                int position = mediaPlayer.getCurrentPosition() / 1000;
+                Intent broadcast = new Intent();
+                broadcast.setAction(BroadcastAction.PLAYBACK.PROGRESS.ACTION);
+                broadcast.putExtra(
+                        BroadcastAction.PLAYBACK.PROGRESS.EXTRA_PROGRESS,
+                        position
+                );
+            }
+
+            public void onFinish() {
+                if (mediaPlayer.isPlaying())
+                    start();
+            }
+
+        }.start();
+    }
+
+    private void broadCastCurrentSong() {
+        Intent broadcast = new Intent();
+        broadcast.setAction(BroadcastAction.FILE.CURRENT_SONG.ACTION);
+        broadcast.putExtra(BroadcastAction.FILE.CURRENT_SONG.EXTRA_SONG, this.currentSong);
+    }
+
+    private void prepareMediaPlayer() {
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.stop();
+        }
+        mediaPlayer.reset();
+
+        if (this.currentSong != null && new File(this.currentSong.getAudioFile()).exists()) {
+            try {
+                mediaPlayer.setDataSource(
+                        getApplicationContext(), Uri.fromFile(new File(currentSong.getAudioFile()))
+                );
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            mediaPlayer.prepareAsync(); // prepare async to not block main thread
+        }
     }
 
     @Override
@@ -87,8 +151,11 @@ public class JBpmMusicService extends Service implements MediaPlayer.OnPreparedL
     }
 
     private void initMediaPlayer() {
-        mMediaPlayer = new MediaPlayer();
-        mMediaPlayer.setOnPreparedListener(this);
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
+        mediaPlayer.setOnPreparedListener(this);
+        mediaPlayer.setOnSeekCompleteListener(this);
+        mediaPlayer.setOnCompletionListener(this);
     }
 
     private void registerBroadcastReceiver() {
@@ -96,6 +163,7 @@ public class JBpmMusicService extends Service implements MediaPlayer.OnPreparedL
         filter.addAction(BroadcastAction.PLAYBACK.PLAY.ACTION);
         filter.addAction(BroadcastAction.PLAYBACK.PAUSE.ACTION);
         filter.addAction(BroadcastAction.PLAYBACK.SKIP.ACTION);
+        filter.addAction(BroadcastAction.PLAYBACK.SET_PROGRESS.ACTION);
         filter.addAction(BroadcastAction.FILE.NEXT_SONG.ACTION);
         registerReceiver(this.broadcastReceiver, filter);
     }
@@ -103,32 +171,6 @@ public class JBpmMusicService extends Service implements MediaPlayer.OnPreparedL
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         showNotification();
-
-        /*if (intent.getAction().equals(MediaServiceConstants.ACTION.STARTFOREGROUND_ACTION)) {
-            Log.i(LOG_TAG, "Received Start Foreground Intent ");
-
-            Toast.makeText(this, "Service Started!", Toast.LENGTH_SHORT).show();
-
-        } else if (intent.getAction().equals(MediaServiceConstants.ACTION.PREV_ACTION)) {
-            Log.i(LOG_TAG, "Clicked Previous");
-
-            Toast.makeText(this, "Clicked Previous!", Toast.LENGTH_SHORT)
-                    .show();
-        } else if (intent.getAction().equals(MediaServiceConstants.ACTION.PLAY_ACTION)) {
-            Log.i(LOG_TAG, "Clicked Play");
-
-            Toast.makeText(this, "Clicked Play!", Toast.LENGTH_SHORT).show();
-        } else if (intent.getAction().equals(MediaServiceConstants.ACTION.NEXT_ACTION)) {
-            Log.i(LOG_TAG, "Clicked Next");
-
-            Toast.makeText(this, "Clicked Next!", Toast.LENGTH_SHORT).show();
-        } else if (intent.getAction().equals(
-                MediaServiceConstants.ACTION.STOPFOREGROUND_ACTION)) {
-            Log.i(LOG_TAG, "Received Stop Foreground Intent");
-            stopForeground(true);
-            stopSelf();
-        }*/
-
         return START_STICKY;
     }
 
@@ -171,6 +213,10 @@ public class JBpmMusicService extends Service implements MediaPlayer.OnPreparedL
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (mediaPlayer != null)
+            mediaPlayer.release();
+        mediaPlayer = null;
+        unregisterReceiver(this.broadcastReceiver);
         Toast.makeText(this, "Service Detroyed!", Toast.LENGTH_SHORT).show();
     }
 
@@ -184,6 +230,21 @@ public class JBpmMusicService extends Service implements MediaPlayer.OnPreparedL
     @Override
     public void onPrepared(MediaPlayer mp) {
         Log.d("mediaplayer", "started");
-        mMediaPlayer.start();
+        mp.start();
+    }
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        broadCastRequestNextSong();
+    }
+
+    private void broadCastRequestNextSong() {
+        Intent broadcast = new Intent();
+        broadcast.setAction(BroadcastAction.FILE.REQUEST_NEXT_SONG.ACTION);
+    }
+
+    @Override
+    public void onSeekComplete(MediaPlayer mp) {
+        mp.start();
     }
 }

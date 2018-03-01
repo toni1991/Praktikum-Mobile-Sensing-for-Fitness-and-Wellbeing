@@ -20,6 +20,10 @@ public interface BroadcastAction {
             String ACTION = "de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.PROGRESS";
             String EXTRA_PROGRESS = "progress";
         }
+        interface SET_PROGRESS {
+            String ACTION = "de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.SET_PROGRESS";
+            String EXTRA_PROGRESS = "progress";
+        }
     }
 
     interface FILE {

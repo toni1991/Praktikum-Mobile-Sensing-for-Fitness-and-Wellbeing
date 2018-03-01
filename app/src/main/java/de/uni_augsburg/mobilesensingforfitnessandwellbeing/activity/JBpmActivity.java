@@ -1,28 +1,20 @@
 package de.uni_augsburg.mobilesensingforfitnessandwellbeing.activity;
 
 import android.Manifest;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.provider.SyncStateContract;
+import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import java.security.Permission;
-import java.util.HashSet;
-
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.BpmMappedSong;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.LocalMusicProvider;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MediaListener;
-import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MediaServiceConstants;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MusicProvider;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.service.JBpmMusicService;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
@@ -42,14 +34,38 @@ public class JBpmActivity extends AppCompatActivity {
         requestPermissions(new String[]{
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE}
-                );
+        );
         findViews();
         startMusicService();
-        //registerBroadcastReceiver();
         init();
     }
 
+    @Override
+    protected void onResume(){
+        super.onResume();
+        registerBroadcastReceivers();
+    }
 
+    @Override
+    protected void onPause(){
+        super.onPause();
+        unregisterBroadcastReceivers();
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        stopService(new Intent(JBpmActivity.this, JBpmMusicService.class));
+    }
+
+    private void registerBroadcastReceivers() {
+        registerReceiver(mediaView.getBroadcastReceiver(), mediaView.getIntentFilter());
+    }
+
+    private void unregisterBroadcastReceivers() {
+        unregisterReceiver(mediaView.getBroadcastReceiver());
+    }
 
     private void startMusicService() {
         Intent musicService = new Intent(this, JBpmMusicService.class);
@@ -102,40 +118,49 @@ public class JBpmActivity extends AppCompatActivity {
         this.musicProvider = new LocalMusicProvider(this);
         BpmMappedSong newSong = this.musicProvider.getNextSong(100);
         this.mediaView.setCurrentSong(newSong);
-        broadCastNewSong(newSong);
+        broadcastNewSong(newSong);
         this.mediaView.setMediaListener(new MediaListener() {
 
             @Override
             public void onSkip() {
                 musicProvider.dislike(null); // TODO: Get current song from music service
                 BpmMappedSong bpmMappedSong = musicProvider.getNextSong(100f); // TODO: Get current desired BPM From bpm service
-                broadCastNewSong(bpmMappedSong);
-                mediaView.setCurrentSong(bpmMappedSong);
+                broadcastNewSong(bpmMappedSong);
+                //mediaView.setCurrentSong(bpmMappedSong);
                 infoView.setCurrentSong(bpmMappedSong);
             }
 
             @Override
             public void onPlayStatusChange(boolean isPlaying) {
-                Intent broadcast = new Intent();
-                if(isPlaying)
-                {
-                    broadcast.setAction(BroadcastAction.PLAYBACK.PLAY.ACTION);
-                }
-                else {
-                    broadcast.setAction(BroadcastAction.PLAYBACK.PAUSE.ACTION);
-                }
-                sendBroadcast(broadcast);
+                broadcastPlayStatus(isPlaying);
             }
 
             @Override
             public void onSeekbarProgressChange(int progress) {
-                Toast.makeText(JBpmActivity.this, ""+progress, Toast.LENGTH_SHORT).show();
+                broadSeekbarChanged(progress);
+                Toast.makeText(JBpmActivity.this, "" + progress, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    public void broadCastNewSong(BpmMappedSong newSong)
-    {
+    private void broadSeekbarChanged(int progress) {
+        Intent broadcast = new Intent();
+        broadcast.setAction(BroadcastAction.PLAYBACK.SET_PROGRESS.ACTION);
+        broadcast.putExtra(BroadcastAction.PLAYBACK.SET_PROGRESS.EXTRA_PROGRESS, progress);
+        sendBroadcast(broadcast);
+    }
+
+    private void broadcastPlayStatus(boolean isPlaying) {
+        Intent broadcast = new Intent();
+        if (isPlaying) {
+            broadcast.setAction(BroadcastAction.PLAYBACK.PLAY.ACTION);
+        } else {
+            broadcast.setAction(BroadcastAction.PLAYBACK.PAUSE.ACTION);
+        }
+        sendBroadcast(broadcast);
+    }
+
+    public void broadcastNewSong(BpmMappedSong newSong) {
         Intent broadcast = new Intent();
         broadcast.setAction(BroadcastAction.FILE.NEXT_SONG.ACTION);
         broadcast.putExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG, newSong);

@@ -1,9 +1,13 @@
 package de.uni_augsburg.mobilesensingforfitnessandwellbeing.view;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.MediaMetadataRetriever;
 import android.support.constraint.ConstraintLayout;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
@@ -16,6 +20,7 @@ import java.util.HashSet;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.BpmMappedSong;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MediaListener;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
 
 /**
  * Created by toni on 27.02.18.
@@ -147,7 +152,7 @@ public class MediaView extends ConstraintLayout {
     }
 
     private void setMediaTitleOfCurrentSong() {
-        setMediaTitle(this.currentSong.getAudioFile());
+        setMediaTitle(new File(this.currentSong.getAudioFile()));
     }
 
     private void setMediaTitle(File audioFile) {
@@ -172,4 +177,39 @@ public class MediaView extends ConstraintLayout {
     public void setMediaTitle(String mediaTitle) {
         this.mediaTitleTextView.setText(mediaTitle);
     }
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.d("BroadcastReceiver MediaView", "Action: " + intent.getAction());
+
+            switch (intent.getAction()) {
+                case BroadcastAction.PLAYBACK.PROGRESS.ACTION:
+                    int progress = intent.getIntExtra(BroadcastAction.PLAYBACK.PROGRESS.EXTRA_PROGRESS, 0);
+                    setMediaCurrentTime(progress);
+                    break;
+                case BroadcastAction.FILE.NEXT_SONG.ACTION:
+                    BpmMappedSong nextSong = intent.getParcelableExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG);
+                    setCurrentSong(nextSong);
+                    break;
+            }
+
+            Log.d("Service", intent.getAction() + intent.getStringExtra("testExtra"));
+        }
+    };
+
+    public BroadcastReceiver getBroadcastReceiver()
+    {
+        return this.broadcastReceiver;
+    }
+
+    public IntentFilter getIntentFilter()
+    {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(BroadcastAction.PLAYBACK.PROGRESS.ACTION);
+        filter.addAction(BroadcastAction.FILE.NEXT_SONG.ACTION);
+        return filter;
+    }
+
 }
