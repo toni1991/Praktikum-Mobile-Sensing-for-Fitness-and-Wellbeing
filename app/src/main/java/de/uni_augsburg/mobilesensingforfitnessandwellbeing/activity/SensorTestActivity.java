@@ -109,6 +109,7 @@ public class SensorTestActivity extends AppCompatActivity {
     }
 
     private void startService() {
+        logText.append("start service");
         Intent i =new Intent(getApplicationContext(),SensorToMusic.class);
         startService(i);
         android.util.Log.d("application start", "x");
@@ -188,7 +189,7 @@ public class SensorTestActivity extends AppCompatActivity {
     }
 
     private boolean requestPermissions(String[] permissions) {
-        boolean allPermissionsGranted = false;
+        boolean allPermissionsGranted = true;
         for (String permission : permissions) {
             if (ActivityCompat.checkSelfPermission(this, permission) !=
                     PackageManager.PERMISSION_GRANTED)
@@ -200,6 +201,10 @@ public class SensorTestActivity extends AppCompatActivity {
                 allPermissionsGranted = false;
                 logText.append("permission " + permission);
 
+            }
+            else
+            {
+                logText.append("permission " + permission + "already granted");
             }
         }
         return allPermissionsGranted;
