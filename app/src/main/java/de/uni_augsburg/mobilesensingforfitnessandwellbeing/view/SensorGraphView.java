@@ -130,21 +130,6 @@ public class SensorGraphView
         };
     }
 
-//    public SensorGraphView(Context context) {
-//        super(context);
-//        init();
-//    }
-//
-//    public SensorGraphView(Context context, AttributeSet attrs) {
-//        super(context, attrs);
-//        init();
-//    }
-//
-//    public SensorGraphView(Context context, AttributeSet attrs, int defStyle) {
-//        super(context, attrs, defStyle);
-//        init();
-//    }
-
     public void init()
     {
         //this.graph = (GraphView) this;
@@ -168,29 +153,6 @@ public class SensorGraphView
         this.graph.getViewport().setMaxX(40);
 
         this.startTime = System.currentTimeMillis();
-
-//        mTimer = new Runnable() {
-//            @Override
-//            public void run() {
-//                graphLastXValue += 1d;
-//                seriesMap.keySet().forEach(s -> {
-//                    seriesMap.get(s).appendData(new DataPoint(getLatestPoint(s).getX(), getLatestPoint(s).getY()), true, 40);
-//                });
-//                mSeries1.appendData(new DataPoint(graphLastXValue, getRandom()), true, 40);
-//                mSeries2.appendData(new DataPoint(graphLastXValue, getRandom()), true, 40);
-//                //mHandler.postDelayed(this, 500);
-//            }
-//        };
-        //this.post(mTimer);
-        //mHandler.postDelayed(mTimer, 100);
-//        HandlerThread handlerThread = new HandlerThread("MyHandlerThread");
-//        handlerThread.start();
-//        Looper looper = handlerThread.getLooper();
-//        Handler handler = new Handler(looper);
-//        handler.postDelayed(mTimer, 500);
-//        Thread graphThread = new Thread(mTimer);
-        //((Activity)getContext()).runOnUiThread(mTimer);
-        //graphThread.start();
     }
 
     public Runnable getGraphListener()
