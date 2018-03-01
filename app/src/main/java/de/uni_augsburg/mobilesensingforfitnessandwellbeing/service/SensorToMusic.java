@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.LinkedList;
+
 import android.os.CountDownTimer;
 
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.sensors.AccSensor;
@@ -36,7 +36,9 @@ public class SensorToMusic extends Service {
     private CountDownTimer countDownTimer;
 
     private Map<String, Sensor> sensors;
-
+    private LinkedList<Float> BPMs;
+    private LinkedList<Long> Times;
+    private long windowLength;
 
     @Nullable
     @Override
@@ -46,6 +48,9 @@ public class SensorToMusic extends Service {
 
     @Override
     public void onCreate() {
+        windowLength = 1500;
+        this.BPMs = new LinkedList<>();
+        this.Times = new LinkedList<>();
         this.broadcastReceiver = new BroadcastReceiver() {
 
         @Override
@@ -84,7 +89,12 @@ public class SensorToMusic extends Service {
         this.countDownTimer = new CountDownTimer(Long.MAX_VALUE, 1000) {
 
             public void onTick(long millisUntilFinished) {
+                long time = System.currentTimeMillis();
                 sensors.forEach((name,sensor)-> broadCastSensor(sensor));
+                sensors.forEach((name,sensor)-> addBPMEstimation(sensor,time) );
+                deleteOldEstimations(time);
+                broadCastBPMEstimation();
+                decisionNewSong(time);
             }
 
             public void onFinish() {
@@ -92,6 +102,43 @@ public class SensorToMusic extends Service {
             }
 
         }.start();
+
+    }
+
+    private void addBPMEstimation(Sensor sensor, long time)
+    {
+        if (!sensor.isReady())
+            return;
+        this.BPMs.add(sensor.getCurrentlyDesiredBpm());
+        this.Times.add(time);
+    }
+
+    private void deleteOldEstimations(long time)
+    {
+        while (!Times.isEmpty() && time - Times.peek() > windowLength) {
+            BPMs.poll();
+            Times.poll();
+        }
+    }
+
+    private void broadCastBPMEstimation()
+    {
+        float estimation = 0.0f;
+        for (float bpm : BPMs)
+        {
+            estimation += bpm;
+        }
+        estimation /= BPMs.size();
+
+        Intent broadcast = new Intent();
+        broadcast.setAction(BroadcastAction.VALUES.BPMESTIMATION.ACTION);
+        broadcast.putExtra(BroadcastAction.VALUES.BPMESTIMATION.EXTRA_VALUEBPM, estimation);
+        sendBroadcast(broadcast);
+
+    }
+
+    private void decisionNewSong(long time)
+    {
 
     }
 
@@ -121,7 +168,7 @@ public class SensorToMusic extends Service {
 
     private void registerBroadcastReceiver() {
         IntentFilter filter = new IntentFilter();
-       // filter.addAction(BroadcastAction.PLAYBACK.);
+        filter.addAction(BroadcastAction.FILE.NEXT_SONG.ACTION);
         registerReceiver(this.broadcastReceiver, filter);
     }
 

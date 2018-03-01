@@ -40,5 +40,9 @@ public interface BroadcastAction {
             String EXTRA_VALUENAME = "valuename";
             String EXTRA_VALUE = "extraValue";
         }
+        interface BPMESTIMATION {
+            String ACTION = "de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BPMESTIMATION";
+            String EXTRA_VALUEBPM = "valuename";
+        }
     }
 }
