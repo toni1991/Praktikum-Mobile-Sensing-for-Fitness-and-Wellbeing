@@ -36,6 +36,7 @@ public class MediaView extends ConstraintLayout {
     private BpmMappedSong currentSong;
 
     private boolean isPlaying = false;
+    private boolean currentlySeeking = false;
     private MediaListener mediaListener;
 
     public MediaView(Context context) {
@@ -113,12 +114,13 @@ public class MediaView extends ConstraintLayout {
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                currentlySeeking = true;
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 mediaListener.onSeekbarProgressChange(seekBar.getProgress());
+                currentlySeeking = false;
             }
         });
     }
@@ -190,8 +192,10 @@ public class MediaView extends ConstraintLayout {
 
             String s = intent.getAction();
             if (s.equals(BroadcastAction.PLAYBACK.PROGRESS.ACTION)) {
-                int progress = intent.getIntExtra(BroadcastAction.PLAYBACK.PROGRESS.EXTRA_PROGRESS, 0);
-                setMediaCurrentTime(progress);
+                if(!currentlySeeking) {
+                    int progress = intent.getIntExtra(BroadcastAction.PLAYBACK.PROGRESS.EXTRA_PROGRESS, 0);
+                    setMediaCurrentTime(progress);
+                }
 
             } else if (s.equals(BroadcastAction.FILE.NEXT_SONG.ACTION)) {
                 BpmMappedSong nextSong = intent.getParcelableExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG);

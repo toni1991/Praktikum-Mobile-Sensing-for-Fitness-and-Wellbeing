@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
 
@@ -46,20 +45,19 @@ public class JBpmActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
         registerBroadcastReceivers();
     }
 
     @Override
-    protected void onPause(){
+    protected void onPause() {
         super.onPause();
         unregisterBroadcastReceivers();
     }
 
     @Override
-    protected void onDestroy()
-    {
+    protected void onDestroy() {
         super.onDestroy();
         stopService(new Intent(JBpmActivity.this, JBpmMusicService.class));
     }
@@ -140,7 +138,6 @@ public class JBpmActivity extends AppCompatActivity {
             @Override
             public void onSeekbarProgressChange(int progress) {
                 broadSeekbarChanged(progress);
-                Toast.makeText(JBpmActivity.this, "" + progress, Toast.LENGTH_SHORT).show();
             }
         });
         this.sensorGraphView = new SensorGraphView(this.graphView);

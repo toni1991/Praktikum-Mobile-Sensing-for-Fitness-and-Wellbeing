@@ -25,11 +25,7 @@ import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.BpmMappedSong;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MediaServiceConstants;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
 
-public class JBpmMusicService extends Service
-        implements
-        MediaPlayer.OnPreparedListener,
-        MediaPlayer.OnCompletionListener,
-        MediaPlayer.OnSeekCompleteListener {
+public class JBpmMusicService extends Service {
 
     private MediaPlayer mediaPlayer = null;
     private BpmMappedSong currentSong;
@@ -148,9 +144,13 @@ public class JBpmMusicService extends Service
     private void initMediaPlayer() {
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
-        mediaPlayer.setOnPreparedListener(this);
-        mediaPlayer.setOnSeekCompleteListener(this);
-        mediaPlayer.setOnCompletionListener(this);
+        setMediaPlayerListeners();
+    }
+
+    private void setMediaPlayerListeners() {
+        mediaPlayer.setOnPreparedListener((MediaPlayer mp) -> playSongIfPossible());
+        mediaPlayer.setOnSeekCompleteListener((MediaPlayer mp) -> playSongIfPossible());
+        mediaPlayer.setOnCompletionListener((MediaPlayer mp) -> broadcastRequestNextSong());
     }
 
     private void registerBroadcastReceiver() {
@@ -217,26 +217,9 @@ public class JBpmMusicService extends Service
         return null;
     }
 
-    // Mediaplayer functions
-    @Override
-    public void onPrepared(MediaPlayer mp) {
-        Log.d("mediaplayer", "started");
-        playSongIfPossible();
-    }
-
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-        broadcastRequestNextSong();
-    }
-
     private void broadcastRequestNextSong() {
         Intent broadcast = new Intent();
         broadcast.setAction(BroadcastAction.FILE.REQUEST_NEXT_SONG.ACTION);
-    }
-
-    @Override
-    public void onSeekComplete(MediaPlayer mp) {
-        playSongIfPossible();
     }
 
     public void broadcastPlayingToggled() {
