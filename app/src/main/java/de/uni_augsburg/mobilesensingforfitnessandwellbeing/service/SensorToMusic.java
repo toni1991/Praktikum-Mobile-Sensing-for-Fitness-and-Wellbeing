@@ -230,7 +230,7 @@ public class SensorToMusic extends Service {
 
     private void registerBroadcastReceiver() {
         IntentFilter filter = new IntentFilter();
-        filter.addAction(BroadcastAction.FILE.NEXT_SONG.ACTION);
+        filter.addAction(BroadcastAction.FILE.REQUEST_NEXT_SONG.ACTION);
         registerReceiver(this.broadcastReceiver, filter);
     }
 
