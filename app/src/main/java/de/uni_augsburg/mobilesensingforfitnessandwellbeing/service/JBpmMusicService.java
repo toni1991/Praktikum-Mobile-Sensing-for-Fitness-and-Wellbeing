@@ -7,12 +7,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -41,34 +41,31 @@ public class JBpmMusicService extends Service
 
             Log.d("JBpmMusicService", "Action: " + intent.getAction());
 
-            switch (intent.getAction()) {
-                case BroadcastAction.PLAYBACK.PLAY.ACTION:
-                    playSongIfPossible();
-                    break;
-                case BroadcastAction.PLAYBACK.PAUSE.ACTION:
-                    pauseIfNotNullAndPlaying();
-                    stopCountdownTimerIfRunning();
-                    break;
-                case BroadcastAction.PLAYBACK.SKIP.ACTION:
-                    break;
-                case BroadcastAction.PLAYBACK.SET_PROGRESS.ACTION:
-                    int progress = intent.getIntExtra(BroadcastAction.PLAYBACK.SET_PROGRESS.EXTRA_PROGRESS, 0);
-                    setMediaProgress(progress);
-                    break;
-                case BroadcastAction.FILE.NEXT_SONG.ACTION:
-                    stopCountdownTimerIfRunning();
-                    currentSong = intent.getParcelableExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG);
-                    prepareMediaPlayer();
-                    break;
-                case BroadcastAction.FILE.REQUEST_CURRENT_SONG.ACTION:
-                    broadCastCurrentSong();
-                    break;
+            String s = intent.getAction();
+            if (s.equals(BroadcastAction.PLAYBACK.PLAY.ACTION)) {
+                playSongIfPossible();
+            } else if (s.equals(BroadcastAction.PLAYBACK.PAUSE.ACTION)) {
+                pauseIfNotNullAndPlaying();
+                stopCountdownTimerIfRunning();
+
+            } else if (s.equals(BroadcastAction.PLAYBACK.SKIP.ACTION)) {
+            } else if (s.equals(BroadcastAction.PLAYBACK.SET_PROGRESS.ACTION)) {
+                int progress = intent.getIntExtra(BroadcastAction.PLAYBACK.SET_PROGRESS.EXTRA_PROGRESS, 0);
+                setMediaProgress(progress);
+
+            } else if (s.equals(BroadcastAction.FILE.NEXT_SONG.ACTION)) {
+                stopCountdownTimerIfRunning();
+                currentSong = intent.getParcelableExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG);
+                prepareMediaPlayer();
+                showNotification();
+            } else if (s.equals(BroadcastAction.FILE.REQUEST_CURRENT_SONG.ACTION)) {
+                broadCastCurrentSong();
             }
         }
     };
 
     private void setMediaProgress(int progress) {
-        if(mediaPlayer.isPlaying()){
+        if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
             mediaPlayer.seekTo(progress * 1000);
             mediaPlayer.start();
@@ -76,8 +73,7 @@ public class JBpmMusicService extends Service
     }
 
     private void stopCountdownTimerIfRunning() {
-        if(countdownTimer != null)
-        {
+        if (countdownTimer != null) {
             countdownTimer.cancel();
         }
     }
@@ -177,26 +173,23 @@ public class JBpmMusicService extends Service
     private void showNotification() {
         PendingIntent mainActivityPendingIntent = getMainActivityPendingIntent();
 
-        Intent playIntent = new Intent(this, JBpmMusicService.class);
-        playIntent.setAction(BroadcastAction.PLAYBACK.PLAY.ACTION);
-        PendingIntent pplayIntent = PendingIntent.getService(this, 0,
-                playIntent, 0);
+        String artist = "";
+        String title = "";
 
-        Intent nextIntent = new Intent(this, JBpmMusicService.class);
-        nextIntent.setAction(BroadcastAction.PLAYBACK.SKIP.ACTION);
-        PendingIntent pnextIntent = PendingIntent.getService(this, 0,
-                nextIntent, 0);
+        if(currentSong != null && new File(currentSong.getAudioFile()).exists()) {
+            MediaMetadataRetriever mmR = new MediaMetadataRetriever();
+            mmR.setDataSource(currentSong.getAudioFile());
+            artist = mmR.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+            title = mmR.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+        }
 
         Notification notification = new NotificationCompat.Builder(this, MediaServiceConstants.NOTIFICATION.CHANNEL_ID)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setSmallIcon(android.R.drawable.ic_dialog_alert)
                 .setContentIntent(mainActivityPendingIntent)
-                .addAction(android.R.drawable.ic_media_pause, "Pause", pplayIntent)  // #1
-                .addAction(android.R.drawable.ic_media_next, "Next", pnextIntent)     // #2
-                .setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle()
-                        .setShowActionsInCompactView(1 /* #1: pause button */))
-                .setContentTitle("Wonderful music")
-                .setContentText("My Awesome Band")
+                .setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle())
+                .setContentTitle(artist)
+                .setContentText(title)
                 .setOngoing(true)
                 .build();
 
