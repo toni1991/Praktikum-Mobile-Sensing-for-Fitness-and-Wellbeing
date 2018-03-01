@@ -21,14 +21,15 @@ import java.io.File;
 import java.io.IOException;
 
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.activity.JBpmActivity;
-import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.BpmMappedSong;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MediaServiceConstants;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.musicLibrary.MusicTrack;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
 
-public class JBpmMusicService extends Service {
+public class JBpmMusicService extends Service
+{
 
     private MediaPlayer mediaPlayer = null;
-    private BpmMappedSong currentSong;
+    private MusicTrack currentSong;
     private CountDownTimer countdownTimer;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -121,10 +122,10 @@ public class JBpmMusicService extends Service {
         }
         mediaPlayer.reset();
 
-        if (this.currentSong != null && new File(this.currentSong.getAudioFile()).exists()) {
+        if (this.currentSong != null && new File(this.currentSong.getPath()).exists()) {
             try {
                 mediaPlayer.setDataSource(
-                        getApplicationContext(), Uri.fromFile(new File(currentSong.getAudioFile()))
+                        getApplicationContext(), Uri.fromFile(new File(currentSong.getPath()))
                 );
             } catch (IOException e) {
                 e.printStackTrace();
@@ -149,8 +150,8 @@ public class JBpmMusicService extends Service {
 
     private void setMediaPlayerListeners() {
         mediaPlayer.setOnPreparedListener((MediaPlayer mp) -> playSongIfPossible());
-        mediaPlayer.setOnSeekCompleteListener((MediaPlayer mp) -> playSongIfPossible());
         mediaPlayer.setOnCompletionListener((MediaPlayer mp) -> broadcastRequestNextSong());
+
     }
 
     private void registerBroadcastReceiver() {
@@ -174,9 +175,9 @@ public class JBpmMusicService extends Service {
         String artist = "";
         String title = "";
 
-        if (currentSong != null && new File(currentSong.getAudioFile()).exists()) {
+        if (currentSong != null && new File(currentSong.getPath()).exists()) {
             MediaMetadataRetriever mmR = new MediaMetadataRetriever();
-            mmR.setDataSource(currentSong.getAudioFile());
+            mmR.setDataSource(currentSong.getPath());
             artist = mmR.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
             title = mmR.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
         }
@@ -220,6 +221,7 @@ public class JBpmMusicService extends Service {
     private void broadcastRequestNextSong() {
         Intent broadcast = new Intent();
         broadcast.setAction(BroadcastAction.FILE.REQUEST_NEXT_SONG.ACTION);
+        sendBroadcast(broadcast);
     }
 
     public void broadcastPlayingToggled() {

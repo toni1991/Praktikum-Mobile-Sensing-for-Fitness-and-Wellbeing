@@ -146,8 +146,6 @@ public class TrackFinder {
                     track.setGenre(readGenreFromFile(directoryListing[i]));
                     i++;
 
-                    //store mp3 file in MusicTrack object
-                    track.setAudioFile(directoryListing[i]);
                     //store filename and path in MusicTrack object
                     track.setName(directoryListing[i].getName());
                     track.setPath(directoryListing[i].getPath());

@@ -6,7 +6,7 @@ import android.util.AttributeSet;
 import android.widget.TextView;
 
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
-import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.BpmMappedSong;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.musicLibrary.MusicTrack;
 
 /**
  * Created by toni on 27.02.18.
@@ -40,7 +40,7 @@ public class InfoView extends ConstraintLayout {
         ((TextView)findViewById(R.id.bpmTextView)).setText(bpmAsString);
     }
 
-    public void setCurrentSong(BpmMappedSong bpmMappedSong) {
+    public void setCurrentSong(MusicTrack bpmMappedSong) {
         setBpmTextView(bpmMappedSong.getBpm());
     }
 }

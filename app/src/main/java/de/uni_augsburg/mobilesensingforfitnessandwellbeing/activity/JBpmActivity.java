@@ -13,10 +13,10 @@ import android.view.MenuItem;
 import com.jjoe64.graphview.GraphView;
 
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
-import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.BpmMappedSong;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.LocalMusicProvider;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MediaListener;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MusicProvider;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.musicLibrary.MusicTrack;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.service.JBpmMusicService;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.view.InfoView;
@@ -127,7 +127,7 @@ public class JBpmActivity extends AppCompatActivity {
             @Override
             public void onSkip() {
                 musicProvider.dislike(null); // TODO: Get current song from music service
-                BpmMappedSong bpmMappedSong = musicProvider.getNextSong(100f); // TODO: Get current desired BPM From bpm service
+                MusicTrack bpmMappedSong = musicProvider.getNextSong(100f); // TODO: Get current desired BPM From bpm service
                 broadcastNewSong(bpmMappedSong);
                 infoView.setCurrentSong(bpmMappedSong);
             }
@@ -164,7 +164,7 @@ public class JBpmActivity extends AppCompatActivity {
         sendBroadcast(broadcast);
     }
 
-    public void broadcastNewSong(BpmMappedSong newSong) {
+    public void broadcastNewSong(MusicTrack newSong) {
         Intent broadcast = new Intent();
         broadcast.setAction(BroadcastAction.FILE.NEXT_SONG.ACTION);
         broadcast.putExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG, newSong);

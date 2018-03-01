@@ -185,11 +185,9 @@ public class SensorToMusic extends Service {
     {
 
         MusicTrack track;
-        File mp3 = null;
 
         //that's how to receive a track object
         track = trackFinder.getNextSong(estimation);
-        mp3 = track.getAudioFile();
 
         //that's how to dislike a track
         if(dislike) {

@@ -6,6 +6,9 @@ import android.os.Build;
 import java.io.File;
 import java.util.concurrent.ThreadLocalRandom;
 
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.musicLibrary.MusicTrack;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.musicLibrary.TrackFinder;
+
 
 public class LocalMusicProvider extends MusicProvider {
 
@@ -19,19 +22,22 @@ public class LocalMusicProvider extends MusicProvider {
     }
 
     @Override
-    public BpmMappedSong getNextSong(float bpm) {
+    public MusicTrack getNextSong(float bpm) {
 
         songCount++;
 
         String audioFile = getRandomAudioFile();
         bpm = getRandomBpm();
         String genre = getRandomGenre();
-
-        return new BpmMappedSong(audioFile, bpm, genre);
+        MusicTrack musicTrack = new MusicTrack();
+        musicTrack.setPath(audioFile);
+        musicTrack.setBPM(bpm);
+        musicTrack.setGenre(genre);
+        return musicTrack;
     }
 
     @Override
-    public void dislike(BpmMappedSong bpmMappedSong) {
+    public void dislike(MusicTrack bpmMappedSong) {
         //Nothing to do here
     }
 
