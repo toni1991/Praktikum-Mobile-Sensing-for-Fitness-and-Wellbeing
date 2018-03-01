@@ -98,7 +98,7 @@ public class AccSensor extends Sensor implements SensorEventListener {
         while (!timeOfSteps.isEmpty() && currentTime - timeOfSteps.peek() > 10000) {
             timeOfSteps.poll();
         }
-        return timeOfSteps.size()  * 60 ;
+        return timeOfSteps.size()  * 6 ;
     }
 
 
