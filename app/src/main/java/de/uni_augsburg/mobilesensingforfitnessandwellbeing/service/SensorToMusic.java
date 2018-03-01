@@ -65,6 +65,8 @@ public class SensorToMusic extends Service {
         windowLength = 1500;
         minSongDuration = 10 * 1000; // 10 sec
         bpmSongChangeThreshold = 25;
+        lastChangedSong = 0;
+
         this.BPMs = new LinkedList<>();
         this.Times = new LinkedList<>();
         this.broadcastReceiver = new BroadcastReceiver() {
@@ -79,12 +81,10 @@ public class SensorToMusic extends Service {
 
                         if (lastBPMEstimation < 0.0f)
                         {
-
-                            // there is no value yet
-                            
+                            broadcastNewSong(75, false);
                         }
 
-                        // NEXT SONG
+                        broadcastNewSong(BPMEstimation(), dislike);
                     }
                     break;
 
@@ -232,6 +232,10 @@ public class SensorToMusic extends Service {
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.FILE.REQUEST_NEXT_SONG.ACTION);
         registerReceiver(this.broadcastReceiver, filter);
+    }
+
+    private void unregisterBroadcastReciever() {
+        unregisterReceiver(this.broadcastReceiver);
     }
 
 }

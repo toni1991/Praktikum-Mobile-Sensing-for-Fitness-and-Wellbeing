@@ -42,10 +42,16 @@ public class JBpmActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_j_bpm);
+
+        this.allPermissions = new ArrayList<>();
+
+
         requestPermissions(new String[]{
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE}
         );
+
+
         findViews();
         startMusicService();
         init();
@@ -193,7 +199,6 @@ public class JBpmActivity extends AppCompatActivity {
     }
 
     private void initSensors() {
-        this.allPermissions = new ArrayList<>();
         boolean request1 = requestPermissions(BTSensor.necessaryPermissions());
         boolean request2 = requestPermissions(GpsSensor.necessaryPermissions());
         if (request1 && request2) {
