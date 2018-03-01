@@ -68,12 +68,12 @@ public class SensorToMusic extends Service {
         // Put new sensors over here
 
         Sensor gpsSensor = new GpsSensor(this);
-        if (activatedSensors.contains(gpsSensor.getSensorName())) {
+        if (activatedSensors.contains(gpsSensor.getSensorName()) || activatedSensors.isEmpty()) {
             sensors.put(gpsSensor.getSensorName(), gpsSensor);
         }
 
         Sensor accSensor = new AccSensor(this);
-        if (activatedSensors.contains(accSensor.getSensorName())) {
+        if (activatedSensors.contains(accSensor.getSensorName()) || activatedSensors.isEmpty()) {
             sensors.put(accSensor.getSensorName(), accSensor);
         }
 
