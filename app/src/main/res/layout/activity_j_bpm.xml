@@ -6,17 +6,16 @@
     android:layout_height="match_parent"
     tools:context="de.uni_augsburg.mobilesensingforfitnessandwellbeing.activity.JBpmActivity">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
+    <com.jjoe64.graphview.GraphView
+        android:id="@+id/graphView"
+        android:layout_width="match_parent"
         android:layout_height="219dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/graph" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <de.uni_augsburg.mobilesensingforfitnessandwellbeing.view.InfoView
         android:id="@+id/infoView"
@@ -28,7 +27,7 @@
         android:layout="@layout/view_info"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        app:layout_constraintTop_toBottomOf="@+id/graphView"
         app:layout_constraintBottom_toTopOf="@+id/mediaView"/>
 
     <de.uni_augsburg.mobilesensingforfitnessandwellbeing.view.MediaView

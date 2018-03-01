@@ -11,6 +11,8 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import com.jjoe64.graphview.GraphView;
+
 import java.security.Permission;
 
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.R;
@@ -22,11 +24,14 @@ import de.uni_augsburg.mobilesensingforfitnessandwellbeing.media.MusicProvider;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.service.JBpmMusicService;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.view.InfoView;
 import de.uni_augsburg.mobilesensingforfitnessandwellbeing.view.MediaView;
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.view.SensorGraphView;
 
 public class JBpmActivity extends AppCompatActivity {
 
     private InfoView infoView;
     private MediaView mediaView;
+    private SensorGraphView sensorGraphView;
+    private GraphView graphView;
     private MusicProvider musicProvider;
 
     /*private JBpmMusicService musicService;
@@ -96,6 +101,7 @@ public class JBpmActivity extends AppCompatActivity {
     private void findViews() {
         this.infoView = findViewById(R.id.infoView);
         this.mediaView = findViewById(R.id.mediaView);
+        this.graphView = findViewById(R.id.graphView);
     }
 
     private void init() {
@@ -116,5 +122,8 @@ public class JBpmActivity extends AppCompatActivity {
                 startMusicService();
             }
         });
+        this.sensorGraphView = new SensorGraphView(this.graphView);
+        this.sensorGraphView.init();
+        new Thread(this.sensorGraphView.getGraphListener()).start();
     }
 }
