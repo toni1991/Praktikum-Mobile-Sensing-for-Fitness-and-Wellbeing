@@ -1,16 +1,11 @@
 package de.uni_augsburg.mobilesensingforfitnessandwellbeing.view;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
-import android.os.AsyncTask;
 import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
-import android.util.AttributeSet;
 import android.util.Log;
 
 import com.jjoe64.graphview.GraphView;
@@ -43,7 +38,6 @@ public class SensorGraphView
     private HashMap<String, LineGraphSeries<DataPoint>> seriesMap = new HashMap<>();
     private GraphView graph;
 
-    private Runnable mTimer;
     private final Handler mHandler = new Handler();
     private LineGraphSeries<DataPoint> mSeries1;
     private LineGraphSeries<DataPoint> mSeries2;
@@ -52,9 +46,11 @@ public class SensorGraphView
     private long startTime;
     private int graphColorCounter;
     private ArrayList<Integer> graphColors = new ArrayList<>();
+
+    // use this for testing purposes
 //    private double graphLastXValue = 5d;
-    double mLastRandom = 2;
-    Random mRand = new Random();
+//    double mLastRandom = 2;
+//    Random mRand = new Random();
 
 
     public void registerSensor(String newSensor)
@@ -91,11 +87,11 @@ public class SensorGraphView
         return (tmp.size() > 0) ? (tmp.get(tmp.size() - 1)) : new DataPoint(0d, 0d);
     }
 
-    // only for testing purposes
-    private double getRandom()
-    {
-        return mLastRandom += mRand.nextDouble()*0.5 - 0.25;
-    }
+    // use this for testing purposes
+//    private double getRandom()
+//    {
+//        return mLastRandom += mRand.nextDouble()*0.5 - 0.25;
+//    }
 
     public void registerBroadcastReceiver(Context context) {
         IntentFilter filter = new IntentFilter();
@@ -122,11 +118,15 @@ public class SensorGraphView
                         if (intent.getStringExtra(BroadcastAction.VALUES.VALUEBROADCAST.EXTRA_VALUENAME).equals("bpm"))
                         {
                             String sensor = intent.getStringExtra(BroadcastAction.VALUES.VALUEBROADCAST.EXTRA_SENSORNAME);
+                            double value = intent.getDoubleExtra(BroadcastAction.VALUES.VALUEBROADCAST.EXTRA_VALUE,Double.MIN_VALUE);
+                            if (value == Double.MIN_VALUE)
+                            {
+                                break;
+                            }
                             if (!sensorNames.contains(sensor))
                             {
                                 registerSensor(sensor);
                             }
-                            double value = intent.getDoubleExtra(BroadcastAction.VALUES.VALUEBROADCAST.EXTRA_VALUE,0.0d);
                             pushNewData(sensor, value);
                         }
                         break;
@@ -137,9 +137,7 @@ public class SensorGraphView
 
     public void init()
     {
-        //this.graph = (GraphView) this;
-//        Log.e("hm...", ""+this.graph.equals(null));
-//
+        // use this for testing purposes
 //        mSeries1 = new LineGraphSeries<>(new DataPoint[] {
 //                new DataPoint(0, 1),
 //                new DataPoint(1, 5),
@@ -150,7 +148,6 @@ public class SensorGraphView
 //                new DataPoint(1, 4),
 //                new DataPoint(2, 6)
 //        });
-//        Log.e("hm2...", ""+(this.graph == null));
 //        this.graph.addSeries(mSeries1);
 //        this.graph.addSeries(mSeries2);
         this.graphColors.add(Color.BLUE);
@@ -161,7 +158,6 @@ public class SensorGraphView
         this.graph.getViewport().setXAxisBoundsManual(true);
         this.graph.getViewport().setMinX(0);
         this.graph.getViewport().setMaxX(40);
-
         this.startTime = System.currentTimeMillis();
     }
 
@@ -179,6 +175,7 @@ public class SensorGraphView
                                 true, 1000);
                     });
                 }
+                // use this for testing purposes
 //                graphLastXValue += 1d;
 //                mSeries1.appendData(new DataPoint(graphLastXValue, getRandom()), true, 40);
 //                mSeries2.appendData(new DataPoint(graphLastXValue, getRandom()), true, 40);
