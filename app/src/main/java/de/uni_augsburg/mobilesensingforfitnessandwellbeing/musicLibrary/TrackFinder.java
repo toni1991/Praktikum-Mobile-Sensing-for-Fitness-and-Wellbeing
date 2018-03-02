@@ -38,6 +38,11 @@ public class TrackFinder extends MusicProvider{
         this.loPrioQueues = createLoPrioQueues();
     }
 
+    /**
+     * Returns a MusicTrack object with a BPM rate similar to the specified float (in a 10 range)
+     * @param bpm
+     * @return
+     */
     @Override
     public MusicTrack getNextSong(float bpm) {
 
@@ -64,6 +69,10 @@ public class TrackFinder extends MusicProvider{
 
     }
 
+    /**
+     * Dislike the speciefied track, it will be shiftet into the suitable low priority SongQueue
+     * @param track
+     */
     @Override
     public void dislike(MusicTrack track) {
 
@@ -87,6 +96,9 @@ public class TrackFinder extends MusicProvider{
         }
     }
 
+    /**
+     * load annotations and audiofiles from music directory
+     */
     private void loadTrackInformation() {
 
         int i = 0;
@@ -96,7 +108,7 @@ public class TrackFinder extends MusicProvider{
         directoryListing = trackDirectory.listFiles();
         float tempBPM;
 
-         if(directoryListing != null) {
+        if(directoryListing != null) {
             Arrays.sort(directoryListing);
             while(i < directoryListing.length) {
                 try {
@@ -132,6 +144,12 @@ public class TrackFinder extends MusicProvider{
         }
     }
 
+    /**
+     * Return the SongQueue containing the current BPM range
+     * @param bpm
+     * @param queueSet
+     * @return
+     */
     private SongQueue getSuitableQueue(float bpm, ArrayList<SongQueue> queueSet) {
 
         SongQueue retval = null;
@@ -170,6 +188,10 @@ public class TrackFinder extends MusicProvider{
         return retval;
     }
 
+    /**
+     * create SongQueues for not-diskliked tracks (high priority)
+     * @return
+     */
     private ArrayList<SongQueue> createHiPrioQueues() {
 
         ArrayList<SongQueue> retval = new ArrayList<>();
@@ -206,7 +228,10 @@ public class TrackFinder extends MusicProvider{
         return retval;
     }
 
-    //PRE: createHiPrioQueues() has to be called first
+    /**
+     *  create SongQueues for disliked tracks (low priority)
+     *  PRE: createHiPrioQueues() has to be called first
+     */
     private ArrayList<SongQueue> createLoPrioQueues() {
 
         ArrayList<SongQueue> retval = new ArrayList<>();
@@ -218,6 +243,11 @@ public class TrackFinder extends MusicProvider{
         return retval;
     }
 
+    /**
+     * extract the bpm value from a .bpm annotation file
+     * @param file
+     * @return
+     */
     private float readBpmFromFile(File file) {
 
         BufferedReader br;
@@ -237,6 +267,11 @@ public class TrackFinder extends MusicProvider{
         return Float.parseFloat(bpm_string);
     }
 
+    /**
+     * extract the genre of a track from a .genre annotation file
+     * @param file
+     * @return
+     */
     private String readGenreFromFile(File file) {
 
         String retval = null;
