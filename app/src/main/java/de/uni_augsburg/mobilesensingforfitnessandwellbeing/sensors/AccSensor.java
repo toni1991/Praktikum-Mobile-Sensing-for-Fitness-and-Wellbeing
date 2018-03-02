@@ -59,11 +59,14 @@ public class AccSensor extends Sensor implements SensorEventListener {
             rEvents.add(newValue);
             timeOfEvents.add(System.currentTimeMillis());
 
-            if (timeOfEvents.size() >= windowLength) {
+            int tmpWindowlength = (windowLength <= rEvents.size())?windowLength:rEvents.size();
+
+
+            if (timeOfEvents.size() >= windowLength || tmpWindowlength > 5) {
                 if (timeOfEvents.size() != rEvents.size())
                     throw new IllegalArgumentException("illegal argument exception AccSensor");
 
-                lastEnergy.add(DSPUitility.calculateShortTermEnergy(rEvents,rEvents.size()-windowLength, windowLength));
+                lastEnergy.add(DSPUitility.calculateShortTermEnergy(rEvents,rEvents.size()-tmpWindowlength, tmpWindowlength));
 
 
                 if (lastEnergy.size() == 3) {
