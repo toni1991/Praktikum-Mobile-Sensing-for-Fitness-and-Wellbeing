@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Mobile Sensing for Fitness and Wellbeing</string>
+    <string name="app_name">Running BPM</string>
     <string name="button_start">Start</string>
     <string name="button_stop">Stop</string>
     <string name="title_activity_settings">Settings</string>
