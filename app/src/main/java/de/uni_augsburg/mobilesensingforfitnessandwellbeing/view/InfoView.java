@@ -29,11 +29,15 @@ public class InfoView extends ConstraintLayout {
             switch (action) {
                 case BroadcastAction.FILE.NEXT_SONG.ACTION:
                     MusicTrack musicTrack = intent.getParcelableExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG);
-                    setCurrentSongBpm(musicTrack != null ? musicTrack.getBpm() : 0.0f);
+                    if(musicTrack != null) {
+                        setCurrentSongBpm(musicTrack.getBpm());
+                    }
                     break;
                 case BroadcastAction.VALUES.BPMESTIMATION.ACTION:
                     float bpm = intent.getFloatExtra(BroadcastAction.VALUES.BPMESTIMATION.EXTRA_VALUEBPM, 0.0f);
-                    setEstimatedBpm(bpm);
+                    if(bpm > 0) {
+                        setEstimatedBpm(bpm);
+                    }
                     break;
 
             }
