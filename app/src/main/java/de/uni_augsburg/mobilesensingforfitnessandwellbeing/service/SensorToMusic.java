@@ -41,36 +41,9 @@ public class SensorToMusic extends Service {
     private long minSongDuration; // mills
     private TrackFinder trackFinder;
 
+    @Override
     public void onCreate() {
         lastChangedSong = 1;
-    }
-
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(this.broadcastReceiver);
-
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-
-        trackFinder = new TrackFinder(this.getApplicationContext());
-
-        windowLength = 1500;
-        minSongDuration = 10 * 1000; // 10 sec
-        bpmSongChangeThreshold = 25;
-
-        this.BPMs = new LinkedList<>();
-        this.Times = new LinkedList<>();
         this.broadcastReceiver = new BroadcastReceiver() {
 
             @Override
@@ -91,6 +64,35 @@ public class SensorToMusic extends Service {
             }
         };
         registerBroadcastReceiver();
+    }
+
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(this.broadcastReceiver);
+        this.countDownTimer.cancel();
+
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+
+        trackFinder = new TrackFinder(this.getApplicationContext());
+
+        windowLength = 1500;
+        minSongDuration = 10 * 1000; // 10 sec
+        bpmSongChangeThreshold = 25;
+
+        this.BPMs = new LinkedList<>();
+        this.Times = new LinkedList<>();
 
         sensors = new HashMap<>();
 
