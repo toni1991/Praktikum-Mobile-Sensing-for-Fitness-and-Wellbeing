@@ -37,6 +37,7 @@ import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
 public class SensorToMusic extends Service {
 
     public static long lastChangedSong; // mills
+    public static MusicTrack lastMusic;
 
     private BroadcastReceiver broadcastReceiver;
     private CountDownTimer countDownTimer;
@@ -70,11 +71,13 @@ public class SensorToMusic extends Service {
     public void onDestroy()
     {
         super.onDestroy();
-        this.unregisterBroadcastReciever();
+        this.unregisterBR();
+        SensorToMusic.lastMusic = null;
+        SensorToMusic.lastChangedSong = 0;
     }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d("timed", "reset" );
 
         trackFinder = new TrackFinder(this.getApplicationContext());
 
@@ -91,7 +94,6 @@ public class SensorToMusic extends Service {
                 switch (intent.getAction()) {
                     case BroadcastAction.FILE.REQUEST_NEXT_SONG.ACTION:
                     {
-                        SensorToMusic.lastChangedSong = System.currentTimeMillis();
                         boolean dislike =  intent.getBooleanExtra(BroadcastAction.FILE.REQUEST_NEXT_SONG.EXTRA_DISLIKE, false);
 
                         if (lastBPMEstimation < 0.0f)
@@ -195,29 +197,27 @@ public class SensorToMusic extends Service {
 
     private void decisionNewSong(long time, float bpmEstimation)
     {
-        Long tmp = (time - SensorToMusic.lastChangedSong );
-        Log.d("blubb", tmp.toString()  );
-
-
         if (!(time - SensorToMusic.lastChangedSong  > + this.minSongDuration ))
             return;
 
 
         if (Math.abs(bpmEstimation - lastBPMEstimation) > bpmSongChangeThreshold)
         {
-            SensorToMusic.lastChangedSong= System.currentTimeMillis();
             broadcastNewSong(bpmEstimation, false);
         }
     }
 
     private void broadcastNewSong(float estimation, boolean dislike)
     {
-
         MusicTrack track = trackFinder.getNextSong(estimation);
 
-        if(dislike) {
-            trackFinder.dislike(track);
+        if(dislike && lastMusic!=null) {
+            trackFinder.dislike(lastMusic);
         }
+
+        lastMusic = track;
+        SensorToMusic.lastChangedSong= System.currentTimeMillis();
+
 
         Intent broadcast = new Intent();
         broadcast.setAction(BroadcastAction.FILE.NEXT_SONG.ACTION);
@@ -255,7 +255,7 @@ public class SensorToMusic extends Service {
         registerReceiver(this.broadcastReceiver, filter);
     }
 
-    private void unregisterBroadcastReciever() {
+    private void unregisterBR() {
         unregisterReceiver(this.broadcastReceiver);
     }
 
