@@ -82,3 +82,10 @@ A music track encapsulates the attributes of a song, which are its filename, fil
 A song queue ist a linked list of MusicTrack objects. The object at the beginning of the list will be selected by the getNextSong() method and the object then be put to the end of the linked list. For each 10 BPM interval between the maximum and minimum BPM of the annotated music files, two song queues are created. The getNextSong() method distinguishes low priority queues and high priority queues. If a track has been disliked, it will be pushed into the low priority queue within the same BPM range. The method getNextSong returns only MusicTracks from the high priority queue if the number of elements in it is >= 5. Otherwise it will also return MusicTracks from the low priority queue with some specified probability. This probability is 1, if the number of elements in the high priority queue is 0. 
 
 ![structure](pictures/readme_zeichnungen.png "Overview")
+
+## References
+
+The annotated music data was taken out of:
+P. Knees, Á. Faraldo, P. Herrera, R. Vogl, S. Böck, F. Hörschläger, and M. Le Goff. 
+Two Data Sets for Tempo Estimation and Key Detection in Electronic Dance Music Annotated from User Corrections. 
+In Proceedings of the 16th International Society for Music Information Retrieval Conference (ISMIR), Málaga, Spain, 2015.

@@ -22,11 +22,6 @@ import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
 /**
  * Created by Kevin on 28.02.2018.
  *
- * Usage:
- * call 'register' with (unique) sensor name
- * push new data points using 'pushNewDataPoint' with
- * - sensor name
- * - current value
  */
 
 public class SensorGraphView
