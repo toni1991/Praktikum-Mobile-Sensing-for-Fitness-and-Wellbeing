@@ -215,9 +215,10 @@ public class SensorToMusic extends Service {
             trackFinder.dislike(lastMusic);
         }
 
-        lastMusic = track;
-        SensorToMusic.lastChangedSong= System.currentTimeMillis();
+        if (lastMusic!=null && lastMusic.getPath() != null && !lastMusic.getPath().equals(track.getPath()))
+            SensorToMusic.lastChangedSong= System.currentTimeMillis();
 
+        lastMusic = track;
 
         Intent broadcast = new Intent();
         broadcast.setAction(BroadcastAction.FILE.NEXT_SONG.ACTION);
