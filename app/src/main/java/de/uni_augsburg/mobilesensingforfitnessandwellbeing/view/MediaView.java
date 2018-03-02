@@ -167,7 +167,12 @@ public class MediaView extends ConstraintLayout {
 
     public void setCurrentSong(MusicTrack nextTrack) {
 
-        if(new File(nextTrack.getPath()).isFile() && (currentSong == null || !nextTrack.getPath().equals(currentSong.getPath()))) {
+        if(nextTrack == null || !nextTrack.isValidTrackFile())
+        {
+            return;
+        }
+
+        if((currentSong == null || !nextTrack.equals(currentSong))) {
             currentSong = nextTrack;
             setMediaTitleOfCurrentSong();
             setMediaTotalTimeOfCurrentSong();

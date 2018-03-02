@@ -55,11 +55,11 @@ public class JBpmMusicService extends Service {
                 setMediaProgress(progress);
             } else if (s.equals(BroadcastAction.FILE.NEXT_SONG.ACTION)) {
                 MusicTrack nextTrack = intent.getParcelableExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG);
-                if(nextTrack == null || nextTrack.getPath() == null)
+                if(nextTrack == null || !nextTrack.isValidTrackFile())
                 {
                     return;
                 }
-                if(currentSong == null || songCompleted || !nextTrack.getPath().equals(currentSong.getPath())) {
+                if(currentSong == null || songCompleted || !nextTrack.equals(currentSong)){
                     currentSong = nextTrack;
                     prepareMediaPlayer();
                     stopCountdownTimerIfRunning();
