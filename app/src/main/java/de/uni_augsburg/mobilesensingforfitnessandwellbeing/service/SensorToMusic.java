@@ -111,17 +111,15 @@ public class SensorToMusic extends Service {
         sensors = new HashMap<>();
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        Set<String> activatedSensors = settings.getStringSet("pref_sensors", new HashSet<String>());
 
         // Put new sensors over here
-
         Sensor gpsSensor = new GpsSensor(this);
-        if (activatedSensors.contains(gpsSensor.getSensorName()) || activatedSensors.isEmpty()) {
+        if (settings.getBoolean("pref_sensor_gps", true)) {
             sensors.put(gpsSensor.getSensorName(), gpsSensor);
         }
 
         Sensor accSensor = new AccSensor(this);
-        if (activatedSensors.contains(accSensor.getSensorName()) || activatedSensors.isEmpty()) {
+        if (settings.getBoolean("pref_sensor_accelerometer", true)) {
             sensors.put(accSensor.getSensorName(), accSensor);
         }
 
