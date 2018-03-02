@@ -59,7 +59,7 @@ public class SensorGraphView
         this.sensorMap.put(newSensor, new ArrayList<>());
         LineGraphSeries<DataPoint> newSeries = new LineGraphSeries<>();
         newSeries.setTitle(newSensor);
-        newSeries.setColor( (this.graphColorCounter < this.graphColors.size()) ?
+        newSeries.setColor((this.graphColorCounter < this.graphColors.size()) ?
                 this.graphColors.get(this.graphColorCounter) : Color.YELLOW);
         this.graphColorCounter++;
         this.graph.addSeries(newSeries);
@@ -71,6 +71,12 @@ public class SensorGraphView
 
     private void pushNewDataPoint(String sensor, DataPoint newPoint)
     {
+        this.sensorMap.get(sensor).forEach(p -> {
+            if (p.getX() == newPoint.getX())
+            {
+                return;
+            }
+        });
         this.sensorMap.get(sensor).add(newPoint);
     }
 
@@ -151,10 +157,11 @@ public class SensorGraphView
 //        this.graph.addSeries(mSeries1);
 //        this.graph.addSeries(mSeries2);
         this.graphColors.add(Color.BLUE);
+        this.graphColors.add(Color.MAGENTA);
         this.graphColors.add(Color.GREEN);
         this.graphColors.add(Color.BLACK);
-        this.graphColors.add(Color.MAGENTA);
         this.graphColorCounter = 0;
+        this.graph.getGridLabelRenderer().setLabelVerticalWidth(70);
         this.graph.getViewport().setXAxisBoundsManual(true);
         this.graph.getViewport().setMinX(0);
         this.graph.getViewport().setMaxX(40);
@@ -179,7 +186,7 @@ public class SensorGraphView
 //                graphLastXValue += 1d;
 //                mSeries1.appendData(new DataPoint(graphLastXValue, getRandom()), true, 40);
 //                mSeries2.appendData(new DataPoint(graphLastXValue, getRandom()), true, 40);
-                mHandler.postDelayed(this, 500);
+                mHandler.postDelayed(this, 1000);
             }
         };
     }
