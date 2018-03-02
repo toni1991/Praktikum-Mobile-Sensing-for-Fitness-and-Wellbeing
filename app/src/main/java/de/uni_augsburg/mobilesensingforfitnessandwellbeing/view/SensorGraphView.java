@@ -156,10 +156,10 @@ public class SensorGraphView
 //        });
 //        this.graph.addSeries(mSeries1);
 //        this.graph.addSeries(mSeries2);
-        this.graphColors.add(Color.BLUE);
-        this.graphColors.add(Color.MAGENTA);
-        this.graphColors.add(Color.GREEN);
-        this.graphColors.add(Color.BLACK);
+        this.graphColors.add(Color.rgb(255, 130, 28));
+        this.graphColors.add(Color.rgb(35, 157, 178));
+        this.graphColors.add(Color.rgb(178, 88, 13));
+        this.graphColors.add(Color.rgb(101, 232, 255));
         this.graphColorCounter = 0;
         this.graph.getGridLabelRenderer().setLabelVerticalWidth(70);
         this.graph.getViewport().setXAxisBoundsManual(true);
