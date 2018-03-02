@@ -73,11 +73,11 @@ public class AccSensor extends Sensor implements SensorEventListener {
                         double preLastDerivation = lastEnergy.get(1) - lastEnergy.get(0);
                         double lastDerivation = lastEnergy.get(2) - lastEnergy.get(1);
 
-                        /*
+
                         if ((preLastDerivation > 0 && lastDerivation < 0) ||
                                 (preLastDerivation < 0 && lastDerivation > 0)) {
-                                */
-                        if (performStepCheck(lastDerivation)){
+
+                        //if (performStepCheck(lastDerivation)){
                             totalSteps++;
                             timeOfSteps.add(System.currentTimeMillis());
                         }
@@ -144,7 +144,7 @@ public class AccSensor extends Sensor implements SensorEventListener {
 
     @Override
     public boolean isReady() {
-        return true;
+        return (lastEnergy.size()==3);
     }
 
 
