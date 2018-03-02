@@ -2,7 +2,7 @@
 
 ![structure](pictures/app_logo.png "Overview")
 
-![screen1](pictures/screen1.jpg "Screenshot")
+![screen1](pictures/screen1.jpg | width=500 )
 
 ### Installation
 
