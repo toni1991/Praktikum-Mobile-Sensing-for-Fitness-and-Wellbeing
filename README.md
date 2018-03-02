@@ -1,8 +1,8 @@
 # Praktikum Mobile Sensing for Fitness and Wellbeing
 
-![structure](pictures/app_logo.png "Overview")
+![structure](pictures/app_logo.png)
 
-![screen1](pictures/screen1.jpg | width=500 )
+![screen1](pictures/screen1.jpg)
 
 ### Installation
 
