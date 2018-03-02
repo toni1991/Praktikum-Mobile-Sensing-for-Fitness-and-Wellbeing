@@ -139,7 +139,7 @@ public class AccSensor extends Sensor implements SensorEventListener {
 
     @Override
     public double getRawSensorValue() {
-        return totalSteps;
+        return rEvents.size();
     }
 
     @Override
