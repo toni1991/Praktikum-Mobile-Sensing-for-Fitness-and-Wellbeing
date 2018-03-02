@@ -142,7 +142,7 @@ public class MediaView extends ConstraintLayout {
         });
     }
 
-    public void setMediaTotalTime(int totalTime) {
+    private void setMediaTotalTime(int totalTime) {
         this.mediaProgressBar.setMax(totalTime);
         setTimeTextView(mediaTotalTimeTextView, totalTime);
     }
@@ -154,7 +154,7 @@ public class MediaView extends ConstraintLayout {
         setMediaTotalTime(Integer.valueOf(duration) / 1000);
     }
 
-    public void setMediaCurrentTime(int currentTime) {
+    private void setMediaCurrentTime(int currentTime) {
         this.mediaProgressBar.setProgress(currentTime);
         setTimeTextView(mediaCurrentTimeTextView, currentTime);
     }
@@ -165,7 +165,7 @@ public class MediaView extends ConstraintLayout {
         timeTextView.setText(minutes + ":" + String.format("%02d", seconds));
     }
 
-    public void setCurrentSong(MusicTrack nextTrack) {
+    private void setCurrentSong(MusicTrack nextTrack) {
 
         if(nextTrack == null || !nextTrack.isValidTrackFile())
         {
@@ -206,7 +206,7 @@ public class MediaView extends ConstraintLayout {
         this.mediaListener = mediaListener;
     }
 
-    public void setMediaTitle(String mediaTitle) {
+    private void setMediaTitle(String mediaTitle) {
         this.mediaTitleTextView.setText(mediaTitle);
     }
 
