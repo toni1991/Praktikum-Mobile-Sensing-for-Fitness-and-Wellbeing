@@ -30,6 +30,7 @@ public class JBpmMusicService extends Service {
     private MusicTrack currentSong;
     private CountDownTimer countdownTimer;
     private boolean shouldPlay = false;
+    private boolean songCompleted = false;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -54,7 +55,11 @@ public class JBpmMusicService extends Service {
                 setMediaProgress(progress);
             } else if (s.equals(BroadcastAction.FILE.NEXT_SONG.ACTION)) {
                 MusicTrack nextTrack = intent.getParcelableExtra(BroadcastAction.FILE.NEXT_SONG.EXTRA_SONG);
-                if(currentSong == null || !nextTrack.getPath().equals(currentSong.getPath())) {
+                if(nextTrack == null || !nextTrack.isValidTrackFile())
+                {
+                    return;
+                }
+                if(currentSong == null || songCompleted || !nextTrack.equals(currentSong)){
                     currentSong = nextTrack;
                     prepareMediaPlayer();
                     stopCountdownTimerIfRunning();
@@ -93,7 +98,8 @@ public class JBpmMusicService extends Service {
         if(!shouldPlay){
             return;
         }
-        
+
+        songCompleted = false;
         if (mediaPlayer != null) {
             mediaPlayer.start();
         }
@@ -134,7 +140,7 @@ public class JBpmMusicService extends Service {
         }
         mediaPlayer.reset();
 
-        if (this.currentSong != null && new File(this.currentSong.getPath()).exists()) {
+        if (currentSongIsAvailable()) {
             try {
                 mediaPlayer.setDataSource(
                         getApplicationContext(), Uri.fromFile(new File(currentSong.getPath()))
@@ -145,6 +151,12 @@ public class JBpmMusicService extends Service {
 
             mediaPlayer.prepareAsync(); // prepare async to not block main thread
         }
+    }
+
+    private boolean currentSongIsAvailable() {
+        return (this.currentSong != null &&
+                this.currentSong.getPath() != null &&
+                new File(this.currentSong.getPath()).exists());
     }
 
     @Override
@@ -165,6 +177,7 @@ public class JBpmMusicService extends Service {
         mediaPlayer.setOnCompletionListener((MediaPlayer mp) -> {
             broadcastRequestNextSong(false);
             pauseIfNotNullAndPlaying();
+            songCompleted = true;
         });
     }
 
@@ -189,7 +202,7 @@ public class JBpmMusicService extends Service {
         String artist = "";
         String title = "";
 
-        if (currentSong != null && new File(currentSong.getPath()).exists()) {
+        if (currentSongIsAvailable()) {
             MediaMetadataRetriever mmR = new MediaMetadataRetriever();
             mmR.setDataSource(currentSong.getPath());
             artist = mmR.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);

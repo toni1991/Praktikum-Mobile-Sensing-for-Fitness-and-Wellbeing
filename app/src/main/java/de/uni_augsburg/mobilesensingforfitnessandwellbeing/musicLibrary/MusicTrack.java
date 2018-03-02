@@ -3,6 +3,8 @@ package de.uni_augsburg.mobilesensingforfitnessandwellbeing.musicLibrary;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.File;
+
 /**
  * Created by Lukas B on 27.02.2018.
  */
@@ -80,5 +82,21 @@ public class MusicTrack implements Parcelable {
         dest.writeString(name);
         dest.writeFloat(bpm);
         dest.writeString(genre);
+    }
+
+    public boolean isValidTrackFile()
+    {
+        return (this.path != null && new File(this.path).exists());
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
+        if (! (other instanceof MusicTrack)) {
+            return false;
+        }
+        return ((MusicTrack) other).getPath().equals(this.path);
     }
 }
