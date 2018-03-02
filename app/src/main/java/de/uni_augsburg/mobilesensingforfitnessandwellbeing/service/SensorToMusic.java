@@ -52,12 +52,12 @@ public class SensorToMusic extends Service {
         return null;
     }
 
+
     @Override
     public void onDestroy() {
         super.onDestroy();
-        this.unregisterBroadcastReceiver();
-        SensorToMusic.lastMusic = null;
-        SensorToMusic.lastChangedSong = 0;
+        unregisterReceiver(this.broadcastReceiver);
+
     }
 
     @Override
@@ -227,10 +227,6 @@ public class SensorToMusic extends Service {
         IntentFilter filter = new IntentFilter();
         filter.addAction(BroadcastAction.FILE.REQUEST_NEXT_SONG.ACTION);
         registerReceiver(this.broadcastReceiver, filter);
-    }
-
-    private void unregisterBroadcastReceiver() {
-        unregisterReceiver(this.broadcastReceiver);
     }
 
 }
