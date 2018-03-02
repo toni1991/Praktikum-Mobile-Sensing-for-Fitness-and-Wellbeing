@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.SensorEvent;
@@ -15,6 +16,8 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.util.UUID;
+
+import de.uni_augsburg.mobilesensingforfitnessandwellbeing.util.BroadcastAction;
 
 /**
  * Created by Kevin on 28.02.2018.
@@ -26,6 +29,17 @@ public class BTSensor extends Sensor implements SensorEventListener
     private boolean isReady;
     private final static int REQUEST_ENABLE_BT = 1;
     private static final UUID MY_UUID = UUID.fromString("fa87c0d0-afac-11de-8a39-0800200c9a66");
+//    private final BroadcastReceiver gattUpdateReceiver = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            final String action = intent.getAction();
+//            if (BroadcastAction.ACTION_DATA_AVAILABLE.equals(action)) {
+//                final BleSensor<?> sensor = BleSensors.getSensor(serviceUuid);
+//                final String text = intent.getStringExtra(BleService.EXTRA_TEXT);
+//                onDataRecieved(sensor, text);
+//            }
+//        }
+//    };
 
 
     public BTSensor(Context context) {
