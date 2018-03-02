@@ -30,6 +30,7 @@ public class AccSensor extends Sensor implements SensorEventListener {
     {
         super(context);
         super.setWindowLengthMillis(1500);
+        stepUp = true;
         windowLength = 25;
         lastEnergy = new LinkedList<>();
 
@@ -64,15 +65,19 @@ public class AccSensor extends Sensor implements SensorEventListener {
 
                 lastEnergy.add(DSPUitility.calculateShortTermEnergy(rEvents,rEvents.size()-windowLength, windowLength));
 
+
                 if (lastEnergy.size() == 3) {
+                    //Log.d("test", preLastDerivation.toString() + " " + newValue);
 
                     if (lastEnergy.get(2) > 12) {
-                        Double preLastDerivation = lastEnergy.get(1) - lastEnergy.get(0);
+                        double preLastDerivation = lastEnergy.get(1) - lastEnergy.get(0);
                         double lastDerivation = lastEnergy.get(2) - lastEnergy.get(1);
-                       // Log.d("test", preLastDerivation.toString() + " " + newValue);
 
+                        /*
                         if ((preLastDerivation > 0 && lastDerivation < 0) ||
                                 (preLastDerivation < 0 && lastDerivation > 0)) {
+                                */
+                        if (performStepCheck(lastDerivation)){
                             totalSteps++;
                             timeOfSteps.add(System.currentTimeMillis());
                         }
@@ -83,6 +88,21 @@ public class AccSensor extends Sensor implements SensorEventListener {
             }
         }
         clearOldSensorValues();
+    }
+
+    boolean stepUp;
+    private boolean performStepCheck(double lastDerivation)
+    {
+        if (stepUp && lastDerivation > 5) {
+            stepUp = false;
+            return true;
+        }
+        else if (!stepUp && lastDerivation < -5)
+        {
+            stepUp = true;
+            return true;
+        }
+        return false;
     }
 
     private void clearOldSensorValues() {
