@@ -41,6 +41,8 @@ The actual speed information is obtained in meters per second. This value than i
 
 ### Accelerometer
 
+The Accelerometer combines the x, y and z via sqrt(x^2+y^2+z^2) into a single value. The value is quite noisy therefore the peaks of the short term energy are used to estimate the current steps per minute. Those are transfered an estimate for the desired beats per minute
+
 ![](pictures/rawValue.png)
 
 ![](pictures/EnergyOfSignal.png)
