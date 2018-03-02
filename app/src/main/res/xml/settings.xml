@@ -1,3 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Misc">
+
+        <EditTextPreference
+            android:defaultValue="175"
+            android:key="pref_height"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Height" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Media">
+
+        <EditTextPreference
+            android:defaultValue="/storage/emulated/0/Music"
+            android:key="pref_media_directory"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="Media directory" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Sensors">
+
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="pref_sensor_gps"
+            android:title="GPS Sensor" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="pref_sensor_accelerometer"
+            android:title="Accelerometer" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="pref_sensor_bluetooth"
+            android:title="Bluetooth Sensor" />
+    </PreferenceCategory>
 </PreferenceScreen>

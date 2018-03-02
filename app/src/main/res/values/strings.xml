@@ -6,10 +6,7 @@
     <string name="sensor_text">Sensor Test</string>
 
     <string name="settings">Settings</string>
-    <string name="settings_height">Height</string>
     <string name="settings_summary_height">Your height in centimeter</string>
-    <string name="settings_sensors">Sensors</string>
-    <string name="settings_summary_sensors">Sensors to use</string>
     <string name="settings_media_directory">Media Directory</string>
     <string name="stop_music_service">Stop music service</string>
 </resources>

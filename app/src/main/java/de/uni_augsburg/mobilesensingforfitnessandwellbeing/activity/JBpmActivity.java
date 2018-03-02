@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -46,8 +47,9 @@ public class JBpmActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_j_bpm);
 
-        this.allPermissions = new ArrayList<>();
+        PreferenceManager.setDefaultValues(this, R.xml.settings, false);
 
+        this.allPermissions = new ArrayList<>();
         requestAllPermissions();
 
         findViews();
