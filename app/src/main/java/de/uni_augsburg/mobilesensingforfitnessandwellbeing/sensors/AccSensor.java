@@ -144,7 +144,7 @@ public class AccSensor extends Sensor implements SensorEventListener {
 
     @Override
     public boolean isReady() {
-        return (lastEnergy.size()==3);
+        return (lastEnergy.size()==2);
     }
 
 
