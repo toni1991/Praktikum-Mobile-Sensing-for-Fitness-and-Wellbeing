@@ -2,6 +2,8 @@
 
 ![structure](pictures/app_logo.png "Overview")
 
+![screen1](pictures/screen1.png "Screenshot")
+
 ### Installation
 
 1. Check out repositiory 
@@ -10,11 +12,11 @@
 
 3. Build and deploy to device
 
-4. Take the audio files from giantsteps-tempo-dataset/audio directory and put them on a folder on the device
+4. Take the audio files from `giantsteps-tempo-dataset/audio` directory and put them on a folder on the device
 
-5. Take the bpm files form giantsteps-tempo-dataset/annotations/tempo and put them in the same folder like the audio files
+5. Take the bpm files form `giantsteps-tempo-dataset/annotations/tempo` and put them in the same folder like the audio files
 
-6. Take the genre files from giantsteps-tempo-dataset/annotations/gener and put them in the same folder like the audio files
+6. Take the genre files from `giantsteps-tempo-dataset/annotations/genre` and put them in the same folder like the audio files
 
 7. Start application and configure the media directory in the settings if necessary (app has to be restarted afterwards!)
 
