@@ -41,6 +41,10 @@ The actual speed information is obtained in meters per second. This value than i
 
 #### Accelerometer
 
+![](pictures/rawValue.png)
+
+![](pictures/EnergyOfSignal.png)
+
 ### Services
 
 To give best user experience the application makes use of Android services. Thus the application can be put to background or the device can be locked, without any influence to the media playback and sensor logic.
@@ -67,7 +71,7 @@ The class TrackFinder inherits from the abstract class MusicProvider which is an
 
 3. Specify media directory: The abstract class method getMediaDirectory is used to set the user-specified directory in which the annotated music for the application is stored.
 
-#### Music tracks: 
+#### Music tracks
 
 A music track encapsulates the attributes of a song, which are its filename, filepath, BPM and genre. The information for a MusicTrack object is extracted from three different file types which have to be located in the same directory for every song. The file types are .bpm, .genre and .mp3 corresponding to the BPM annotation for a track, the genre annotation and its audio file.
 
