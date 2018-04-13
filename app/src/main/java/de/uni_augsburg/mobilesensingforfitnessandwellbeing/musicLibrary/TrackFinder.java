@@ -96,12 +96,23 @@ public class TrackFinder extends MusicProvider{
         }
     }
 
+
+    /**
+     * find bpm and genre files for mp3 files
+     */
+    private File lookForFileWithEnding(String name, String ending, File[] directoryListing) {
+        for (int i = 0; i < directoryListing.length; i++) {
+            if (directoryListing[i].getName().equals(name + ending))
+                return directoryListing[i];
+        }
+        return null;
+    }
+
     /**
      * load annotations and audiofiles from music directory
      */
     private void loadTrackInformation() {
 
-        int i = 0;
         BufferedReader br;
         MusicTrack track;
         File[] directoryListing;
@@ -109,27 +120,44 @@ public class TrackFinder extends MusicProvider{
         float tempBPM;
 
         if(directoryListing != null) {
-            Arrays.sort(directoryListing);
-            while(i < directoryListing.length) {
+            for (int i = 0; i < directoryListing.length; i++) {
                 try {
+                    String name = directoryListing[i].getName();
+
+                    File mp3File = null;
+                    File bpmFile = null;
+                    File genreFile = null;
+
+                    if (name.endsWith(".mp3"))
+                    {
+                        mp3File = directoryListing[i];
+                        bpmFile = this.lookForFileWithEnding(name.substring(0, name.length() - 4),".bpm",directoryListing);
+                        genreFile = this.lookForFileWithEnding(name.substring(0, name.length() - 4),".genre",directoryListing);
+                    }
+                    if (mp3File == null || bpmFile == null || genreFile == null)
+                    {
+                        continue;
+                    }
+
+
                     //create new musictrack object
                     track = new MusicTrack();
 
                     //extract BPM
-                    tempBPM = readBpmFromFile(directoryListing[i]);
+                    tempBPM = readBpmFromFile(bpmFile);
                     minBPM = Math.min(minBPM, tempBPM);
                     maxBPM = Math.max(maxBPM, tempBPM);
-                    track.setBPM(readBpmFromFile(directoryListing[i]));
-                    i++;
+                    track.setBPM(tempBPM);
+
 
                     //extract .genre File of track (i+1)/2 - genre
-                    track.setGenre(readGenreFromFile(directoryListing[i]));
-                    i++;
+                    track.setGenre(readGenreFromFile(genreFile));
+
 
                     //store filename and path in MusicTrack object
-                    track.setName(directoryListing[i].getName());
-                    track.setPath(directoryListing[i].getPath());
-                    i++;
+                    track.setName(mp3File.getName());
+                    track.setPath(mp3File.getPath());
+
 
                     //add track to collection
                     tracks.add(track);
@@ -256,11 +284,9 @@ public class TrackFinder extends MusicProvider{
         try {
             br = new BufferedReader(new FileReader(file));
             bpm_string = br.readLine();
-        }
-        catch(FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             Toast.makeText(context, "FileNotFoundException: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-        catch(IOException e) {
+        } catch (IOException e) {
             Toast.makeText(context, "IOException: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
 
